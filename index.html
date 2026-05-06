@@ -62,8 +62,13 @@
         <div class="card">
             <span class="title">تسجيل مبيعات 🛍️</span>
             <select id="pos-model"></select>
-            <input type="number" id="pos-price" placeholder="سعر البيع الفعلي (مثال: 250)">
-            <button class="btn-p" onclick="sellItem()">تأكيد البيع وخصم القطعة</button>
+            
+            <div class="flex-row">
+                <input type="number" id="pos-qty" placeholder="العدد" value="1" min="1" style="flex: 0.4;">
+                <input type="number" id="pos-price" placeholder="سعر القطعة الواحدة (ج.م)">
+            </div>
+            
+            <button class="btn-p" onclick="sellItem()">تأكيد البيع وخصم القطع</button>
         </div>
 
         <div class="card">
@@ -185,11 +190,9 @@
         
         if(data) {
             for(let key in data) {
-                // الكاشير بيشوف اللي فيه رصيد بس
                 if(data[key].stock > 0) {
                     sel.innerHTML += `<option value="${key}">${data[key].name}</option>`;
                 }
-                // الإدمن بيشوف الجرد كله مع تحذير النواقص
                 const stockClass = data[key].stock < 5 ? 'low-stock' : '';
                 sBody.innerHTML += `<tr>
                     <td>${data[key].name}</td>
@@ -199,23 +202,32 @@
         }
     });
 
-    // 2. الكاشير: بيع قطعة (السعر يدوي)
+    // 2. الكاشير: بيع بالعدد والسعر
     window.sellItem = () => {
         const sel = document.getElementById('pos-model');
-        const price = Number(document.getElementById('pos-price').value);
-        if(!sel.value) return alert("اختر الموديل الأول!");
-        if(!price || price <= 0) return alert("اكتب سعر البيع صح!");
+        const pricePerPiece = Number(document.getElementById('pos-price').value);
+        const qty = Number(document.getElementById('pos-qty').value);
 
-        const name = "بيع: " + sel.options[sel.selectedIndex].text;
+        if(!sel.value) return alert("اختر الموديل الأول!");
+        if(!qty || qty <= 0) return alert("اكتب العدد بشكل صحيح!");
+        if(!pricePerPiece || pricePerPiece <= 0) return alert("اكتب سعر القطعة صح!");
+
+        const modelName = sel.options[sel.selectedIndex].text;
+        const totalPrice = pricePerPiece * qty;
+        
+        // تسجيل اسم الصنف مع العدد في اليومية
+        const ledgerTitle = `بيع: ${modelName} (عدد ${qty})`;
         const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
 
-        // إضافة لليومية
-        push(ref(db, `ledgers/${todayDate}`), { title: name, amount: price, type: 'in', time });
-        // خصم من المخزن
-        update(ref(db, `inventory/${sel.value}`), { stock: increment(-1) });
+        // إضافة لليومية بإجمالي السعر
+        push(ref(db, `ledgers/${todayDate}`), { title: ledgerTitle, amount: totalPrice, type: 'in', time });
+        
+        // خصم العدد الكامل من المخزن
+        update(ref(db, `inventory/${sel.value}`), { stock: increment(-qty) });
         
         document.getElementById('pos-price').value = '';
-        alert("تم البيع وخصم القطعة من المخزن!");
+        document.getElementById('pos-qty').value = '1'; // إرجاع العدد لـ 1 تلقائياً
+        alert(`تم بيع عدد ${qty} قطعة وتسجيل مبلغ ${totalPrice} ج.م في اليومية!`);
     };
 
     // 3. الكاشير: تسجيل خارج
@@ -267,20 +279,18 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        // إعداد الخطوط والألوان
         doc.setFontSize(22);
-        doc.setTextColor(194, 89, 131); // لون أيتن
+        doc.setTextColor(194, 89, 131); 
         doc.text("Aytin Daily Shift Report", 105, 20, { align: 'center' });
         
         doc.setFontSize(14);
         doc.setTextColor(50);
         doc.text(`Date: ${todayDate}`, 105, 30, { align: 'center' });
 
-        // تجميع الداتا للجدول
         const rows = [];
         document.querySelectorAll('#ledger-body tr').forEach(tr => {
             const tds = tr.querySelectorAll('td');
-            rows.push([tds[2].innerText, tds[1].innerText, tds[0].innerText]); // الوقت، المبلغ، البيان
+            rows.push([tds[2].innerText, tds[1].innerText, tds[0].innerText]); 
         });
 
         doc.autoTable({
@@ -289,17 +299,15 @@
             startY: 40,
             theme: 'grid',
             headStyles: { fillColor: [194, 89, 131] },
-            styles: { halign: 'right' } // المحاذاة يمين عشان العربي لو موجود
+            styles: { halign: 'right' } 
         });
 
-        // طباعة الإجماليات في آخر الصفحة
         const finalY = doc.lastAutoTable.finalY + 15;
         const net = document.getElementById('stat-net').innerText;
         doc.setFontSize(16);
         doc.setTextColor(74, 20, 140);
-        doc.text(`Net Cash (الصافي): ${net}`, 190, finalY, { align: 'right' });
+        doc.text(`Net Cash: ${net}`, 190, finalY, { align: 'right' });
 
-        // لوجو المحل
         const img = new Image();
         img.src = 'icon.png';
         img.onload = function() {
