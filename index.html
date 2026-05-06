@@ -11,12 +11,10 @@
     <title>أيتن - Aytin POS</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        :root { --p: #c25983; --pl: #fce4ec; --s: #4a148c; --bg: #fdfafb; --glass: rgba(255, 255, 255, 0.85); }
+        :root { --p: #c25983; --pl: #fce4ec; --s: #4a148c; --bg: #fdfafb; --glass: rgba(255, 255, 255, 0.9); }
         * { box-sizing: border-box; font-family: 'Tajawal', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); margin: 0; padding-bottom: 90px; color: #333; overflow-x: hidden; }
         
@@ -59,42 +57,89 @@
 
         #toast { visibility: hidden; min-width: 280px; background: rgba(51, 51, 51, 0.95); backdrop-filter: blur(10px); color: #fff; text-align: center; border-radius: 30px; padding: 15px 20px; position: fixed; z-index: 9999; left: 50%; bottom: 80px; transform: translateX(-50%) translateY(20px); font-size: 15px; font-weight: bold; opacity: 0; transition: all 0.4s; }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
+        
+        /* إعدادات الطباعة للـ PDF */
+        @media print {
+            body * { visibility: hidden; }
+            #print-area, #print-area * { visibility: visible; }
+            #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; font-family: 'Tajawal', sans-serif; }
+            .no-print { display: none !important; }
+        }
+        
+        /* تنسيق ورقة الطباعة المخفية */
+        #print-area { background: #fff; color: #000; }
+        .print-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .print-info { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; }
+        .print-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .print-table th, .print-table td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+        .print-table th { background: #f5f5f5; font-weight: bold; }
+        .print-total-box { border: 2px solid #000; padding: 15px; font-size: 18px; font-weight: bold; width: fit-content; margin-right: auto; background: #f9f9f9; }
+        .print-footer { text-align: center; margin-top: 50px; color: #666; font-size: 14px; position: relative; }
+        .print-logo { width: 60px; height: 60px; border-radius: 50%; position: absolute; left: 20px; bottom: 0; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
 
 <div id="toast"></div>
 
-<header>
+<div id="print-area" class="hidden">
+    <div class="print-header">
+        <h1 style="margin: 0; font-size: 24px;">محلات أيتـن Aytin</h1>
+        <p style="margin: 5px 0 0 0; font-size: 16px; color: #555;">كشف حساب وردية مفصل</p>
+    </div>
+    <div class="print-info">
+        <div id="p-date">التاريخ: </div>
+        <div>المسؤول: كاشير الوردية</div>
+    </div>
+    <table class="print-table">
+        <thead>
+            <tr>
+                <th>البيان (صنف / مصروف)</th>
+                <th>التاريخ والوقت</th>
+                <th>الكمية والسعر</th>
+                <th>الإجمالي</th>
+            </tr>
+        </thead>
+        <tbody id="p-tbody"></tbody>
+    </table>
+    <div class="print-total-box" id="p-total">الإجمالي الصافي: 0 ج.م</div>
+    
+    <div class="print-footer">
+        <p>شكراً لتعاملكم معنا - إدارة محلات أيتن</p>
+        <p>تم إصدار هذا الكشف آلياً</p>
+        <img src="icon.png" class="print-logo" alt="لوجو أيتن">
+    </div>
+</div>
+
+<header class="no-print">
     <div class="role-btn" onclick="toggleRole()">المدير 🔒</div>
     <img src="icon.png" alt="Aytin" onerror="this.src='https://via.placeholder.com/60/c25983/fff?text=A'">
     <h2 style="margin:0; color:var(--p); font-size:20px;">أيتـن Aytin <span id="role-text" style="font-size:12px; color:#888;">(كاشير)</span></h2>
 </header>
 
-<div class="container">
-    
+<div class="container no-print">
     <div id="cashier-tab">
         <div class="card">
-            <span class="title">نقطة البيع السريعة (POS) 🛒</span>
+            <span class="title">تسجيل مبيعات الوردية 🛒</span>
             <select id="pos-model"></select>
             <div class="flex-row">
                 <input type="number" id="pos-qty" placeholder="العدد" value="1" min="1" style="flex: 0.35;">
                 <input type="number" id="pos-price" placeholder="سعر القطعة (ج.م)">
             </div>
-            <button class="btn-p" onclick="sellItem()">تسجيل البيع بالوقت والتاريخ</button>
+            <button class="btn-p" onclick="sellItem()">تأكيد البيع وخصم البضاعة</button>
         </div>
 
         <div class="card">
             <span class="title" style="color:#e74c3c; border-color:#e74c3c;">المصروفات اليومية 💸</span>
             <div class="flex-row">
-                <input type="text" id="out-desc" placeholder="البيان (ضيافة، أكياس)">
+                <input type="text" id="out-desc" placeholder="البيان (ضيافة، نقل...)">
                 <input type="number" id="out-val" placeholder="المبلغ">
             </div>
             <button class="btn-out" onclick="addExpense()">سجل مصروف (-)</button>
         </div>
 
         <div class="card">
-            <span class="title">يومية الوردية</span>
+            <span class="title">يومية الوردية الحالية</span>
             <div class="stats">
                 <div>مبيعات<br><span id="stat-in" style="color:#2ecc71">0</span></div>
                 <div>مصروفات<br><span id="stat-out" style="color:#e74c3c">0</span></div>
@@ -104,14 +149,16 @@
                 <thead><tr><th>البيان</th><th>المبلغ</th><th>الوقت</th></tr></thead>
                 <tbody id="ledger-body"></tbody>
             </table>
-            <button class="btn-save" onclick="saveAndResetShift()">📥 حفظ وتقفيل كشف اليومية (PDF)</button>
+            <button class="btn-save" onclick="saveAndResetShift()">📥 حفظ وتقفيل الوردية (تصفير PDF)</button>
         </div>
     </div>
 
     <div id="admin-tab" class="hidden">
         <div class="card">
             <span class="title">تحليل مبيعات الوردية 📊</span>
-            <canvas id="salesChart" height="200"></canvas>
+            <div style="position: relative; height:250px; width:100%;">
+                <canvas id="salesChart"></canvas>
+            </div>
         </div>
 
         <div class="card" style="border:2px solid var(--p);">
@@ -133,7 +180,7 @@
 
 </div>
 
-<nav class="nav">
+<nav class="nav no-print">
     <div class="active" id="nav-cashier" onclick="switchTab('cashier')">شاشة البيع</div>
     <div id="nav-admin" onclick="switchTab('admin')">لوحة الإدارة</div>
 </nav>
@@ -156,7 +203,7 @@
     const db = getDatabase(app);
 
     let isAdmin = false;
-    const todayDate = new Date().toLocaleDateString('en-CA'); // صيغة YYYY-MM-DD
+    const todayDate = new Date().toLocaleDateString('en-CA'); 
     const displayDate = new Date().toLocaleDateString('ar-EG');
     let currentShiftData = null; 
     let salesChartInstance = null;
@@ -175,6 +222,7 @@
             if(pass === "12345") {
                 isAdmin = true;
                 document.getElementById('role-text').innerText = "(المدير)";
+                switchTab('admin');
                 showToast("أهلاً بك في لوحة الإدارة");
             } else { showToast("الباسورد غير صحيح!", "error"); }
         } else {
@@ -187,11 +235,16 @@
 
     window.switchTab = (tab) => {
         if(tab === 'admin' && !isAdmin) return showToast("صلاحيات المدير مطلوبة 🔒", "error");
+        
         document.getElementById('cashier-tab').classList.toggle('hidden', tab !== 'cashier');
         document.getElementById('admin-tab').classList.toggle('hidden', tab !== 'admin');
         document.getElementById('nav-cashier').classList.toggle('active', tab === 'cashier');
         document.getElementById('nav-admin').classList.toggle('active', tab === 'admin');
-        if(tab === 'admin') updateChart();
+        
+        // تأخير بسيط عشان الـ Canvas ياخد حجمه الطبيعي قبل ما يترسم
+        if(tab === 'admin') {
+            setTimeout(() => { updateChart(); }, 150);
+        }
     };
 
     window.addStock = () => {
@@ -228,7 +281,6 @@
         }
     });
 
-    // تسجيل البيع بالثواني
     window.sellItem = () => {
         const sel = document.getElementById('pos-model');
         const pricePerPiece = Number(document.getElementById('pos-price').value);
@@ -240,11 +292,10 @@
 
         const modelName = sel.options[sel.selectedIndex].text;
         const totalPrice = pricePerPiece * qty;
-        // صيغة الوقت بالثواني
         const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 
         push(ref(db, `ledgers/${todayDate}`), { 
-            title: `[مبيعات] ${modelName}`, 
+            title: `[قطعة] ${modelName}`, 
             amount: totalPrice, 
             type: 'in', 
             time: time, 
@@ -266,7 +317,7 @@
         if(!desc || !val) return showToast("البيانات غير مكتملة", "error");
         
         const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
-        push(ref(db, `ledgers/${todayDate}`), { title: `[مصروفات] ${desc}`, amount: -Math.abs(val), type: 'out', time: time });
+        push(ref(db, `ledgers/${todayDate}`), { title: `[مصروف] ${desc}`, amount: -Math.abs(val), type: 'out', time: time });
         
         document.getElementById('out-desc').value = ''; document.getElementById('out-val').value = '';
         showToast("تم تسجيل المصروف", "error");
@@ -287,131 +338,95 @@
         document.getElementById('stat-in').innerText = totalIn;
         document.getElementById('stat-out').innerText = totalOut;
         document.getElementById('stat-net').innerText = totalIn - totalOut;
-        if(isAdmin) updateChart();
+        
+        // التحديث لو الإدمن فاتح التاب
+        if(isAdmin && document.getElementById('admin-tab').classList.contains('hidden') === false) {
+            updateChart();
+        }
     });
 
     const updateChart = () => {
         if(!currentShiftData) return;
         const salesByModel = {};
+        let hasData = false;
         for(let key in currentShiftData) {
             const entry = currentShiftData[key];
             if(entry.type === 'in' && entry.model) {
                 salesByModel[entry.model] = (salesByModel[entry.model] || 0) + entry.qty;
+                hasData = true;
             }
         }
-        const ctx = document.getElementById('salesChart').getContext('2d');
+        
+        if(!hasData) return;
+
+        const canvas = document.getElementById('salesChart');
+        if(!canvas) return;
+        
+        const ctx = canvas.getContext('2d');
         if(salesChartInstance) salesChartInstance.destroy();
+        
         salesChartInstance = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: Object.keys(salesByModel),
-                datasets: [{ data: Object.values(salesByModel), backgroundColor: ['#c25983', '#f48fb1', '#4a148c', '#ce93d8', '#2ecc71'] }]
+                datasets: [{ 
+                    data: Object.values(salesByModel), 
+                    backgroundColor: ['#c25983', '#f48fb1', '#4a148c', '#ce93d8', '#2ecc71'] 
+                }]
             },
-            options: { responsive: true, plugins: { legend: { position: 'right', labels: {font:{family:'Tajawal'}} } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right', labels: {font:{family:'Tajawal'}} } } 
+            }
         });
     };
 
-    // تصميم ورقة الـ A4 الاحترافية
     window.saveAndResetShift = () => {
-        if(!currentShiftData) return showToast("الوردية فارغة!", "error");
-        if(!confirm("سيتم تصفير الوردية الحالية وتصدير كشف حساب مفصل، متأكد؟")) return;
+        if(!currentShiftData) return showToast("الوردية فارغة، مفيش حاجة تتقفل!", "error");
+        if(!confirm("تأكيد: هيتم طباعة الـ PDF وتصفير الشاشة نهائياً عشان تبدأ وردية جديدة. متأكد؟")) return;
         
-        const { jsPDF } = window.jspdf; 
-        const doc = new jsPDF('p', 'mm', 'a4'); // مقاس A4
-        
-        // استدعاء خط يدعم العربي
-        doc.addFont('https://fonts.gstatic.com/s/tajawal/v9/I7ak6P8n9lYF6iIw7yc.ttf', 'Tajawal', 'normal');
-        doc.setFont('Tajawal');
-
-        // الهيدر
-        doc.setFontSize(22);
-        doc.setTextColor(0, 0, 0); 
-        doc.text("محلات أيتـن للطرح والكارينا", 105, 25, { align: 'center' });
-        doc.setFontSize(13);
-        doc.setTextColor(100, 100, 100);
-        doc.text("كشف حساب وردية مفصل", 105, 33, { align: 'center' });
-
-        // تفاصيل اليومية
-        doc.setFontSize(11);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`التاريخ: ${displayDate}`, 190, 45, { align: 'right' });
-        doc.text(`المسؤول: كاشير الوردية`, 20, 45, { align: 'left' });
-        
-        // خط فاصل
-        doc.setLineWidth(0.5);
-        doc.line(20, 48, 190, 48);
-
-        // تجهيز بيانات الجدول التفصيلي
-        const rows = [];
-        for(let key in currentShiftData) {
-            const entry = currentShiftData[key];
-            const timeDateStr = `${displayDate}\n${entry.time}`;
+        // 1. أرشفة الداتا الأول عشان نضمن إنها متضيعش
+        const shiftId = Date.now();
+        set(ref(db, `archives/${todayDate}_Shift_${shiftId}`), currentShiftData).then(() => {
             
-            let qtyPriceStr = '-';
-            if(entry.type === 'in') {
-                qtyPriceStr = `العدد: ${entry.qty} × ${entry.pricePerPiece} ج`;
+            // 2. تجهيز ورقة الطباعة (PDF)
+            document.getElementById('p-date').innerText = `التاريخ: ${displayDate}`;
+            const pBody = document.getElementById('p-tbody');
+            pBody.innerHTML = '';
+            
+            for(let key in currentShiftData) {
+                const entry = currentShiftData[key];
+                const timeStr = `${displayDate} - ${entry.time}`;
+                let qtyPriceStr = '-';
+                if(entry.type === 'in') {
+                    qtyPriceStr = `العدد: ${entry.qty} × ${entry.pricePerPiece} ج`;
+                }
+                
+                pBody.innerHTML += `<tr>
+                    <td style="text-align: right;">${entry.title}</td>
+                    <td>${timeStr}</td>
+                    <td>${qtyPriceStr}</td>
+                    <td style="font-weight:bold;">${Math.abs(entry.amount)} ج</td>
+                </tr>`;
             }
             
-            const totalStr = `${Math.abs(entry.amount)} ج`;
-            const titleStr = entry.title;
-
-            // الترتيب: الإجمالي | الكمية والسعر | التاريخ والوقت | البيان
-            rows.push([totalStr, qtyPriceStr, timeDateStr, titleStr]);
-        }
-
-        // رسم الجدول
-        doc.autoTable({
-            head: [['الإجمالي', 'الكمية والسعر', 'التاريخ والوقت', 'البيان (صنف / مصروف)']],
-            body: rows, 
-            startY: 55, 
-            theme: 'grid',
-            headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], font: 'Tajawal', halign: 'center' }, 
-            styles: { font: 'Tajawal', halign: 'center', valign: 'middle' },
-            columnStyles: { 3: { halign: 'right' } } // نخلي البيان يمين
-        });
-
-        // المربع الخاص بالإجمالي المطلوب سداده
-        const finalY = doc.lastAutoTable.finalY + 15;
-        const netValue = document.getElementById('stat-net').innerText;
-        
-        // رسم مستطيل للإجمالي
-        doc.setDrawColor(0, 0, 0);
-        doc.setFillColor(250, 250, 250);
-        doc.rect(120, finalY, 70, 12, 'FD'); 
-        
-        doc.setFontSize(14);
-        doc.setTextColor(0, 0, 0);
-        doc.text(`الإجمالي الصافي: ${netValue} ج.م`, 185, finalY + 8, { align: 'right' });
-
-        // تذييل الصفحة
-        doc.setFontSize(10);
-        doc.setTextColor(150, 150, 150);
-        doc.text("شكراً لتعاملكم معنا - إدارة محلات أيتن", 105, finalY + 30, { align: 'center' });
-        doc.text("تم إصدار هذا الكشف آلياً", 105, finalY + 35, { align: 'center' });
-
-        // إضافة اللوجو الدائري تحت على الشمال
-        const img = new Image();
-        img.src = 'icon.png';
-        img.onload = function() {
-            doc.addImage(img, 'PNG', 20, 260, 20, 20); // مقاس اللوجو ومكانه في الـ A4
-            doc.save(`Aytin_Report_${Date.now()}.pdf`);
-            resetAndArchive();
-        };
-        
-        // لو الصورة محملتش يطبع من غيرها ويصفر
-        if(!img.complete) {
-            doc.save(`Aytin_Report_${Date.now()}.pdf`);
-            resetAndArchive();
-        }
-
-        // دالة التصفير والأرشفة
-        function resetAndArchive() {
-            set(ref(db, `archives/${todayDate}_Shift_${Date.now()}`), currentShiftData).then(() => {
-                remove(ref(db, `ledgers/${todayDate}`)).then(() => { 
+            document.getElementById('p-total').innerText = `الإجمالي المطلوب سداده: ${document.getElementById('stat-net').innerText} ج.م`;
+            
+            // 3. مسح الداتا من الخزنة
+            remove(ref(db, `ledgers/${todayDate}`)).then(() => { 
+                
+                // 4. إظهار نافذة الطباعة (حفظ كـ PDF)
+                document.getElementById('print-area').classList.remove('hidden');
+                setTimeout(() => {
+                    window.print();
+                    document.getElementById('print-area').classList.add('hidden');
                     showToast("تم تصدير الـ PDF بنجاح وتصفير الوردية!"); 
-                });
-            });
-        }
+                }, 500); // تأخير بسيط عشان المتصفح يلحق يرسم الورقة
+                
+            }).catch(e => showToast("حدث خطأ أثناء التصفير", "error"));
+            
+        }).catch(e => showToast("حدث خطأ أثناء الاتصال بقاعدة البيانات", "error"));
     };
 </script>
 </body>
