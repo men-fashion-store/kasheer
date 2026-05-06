@@ -14,7 +14,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
-        :root { --p: #c25983; --pl: #fce4ec; --s: #4a148c; --bg: #fdfafb; --glass: rgba(255, 255, 255, 0.9); }
+        :root { --p: #c25983; --pl: #fce4ec; --s: #4a148c; --bg: #fdfafb; --glass: rgba(255, 255, 255, 0.95); }
         * { box-sizing: border-box; font-family: 'Tajawal', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
         body { background: var(--bg); margin: 0; padding-bottom: 90px; color: #333; overflow-x: hidden; }
         
@@ -25,57 +25,59 @@
         .container { padding: 15px; max-width: 600px; margin: auto; animation: fadeIn 0.4s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: #fff; border-radius: 20px; padding: 22px; margin-bottom: 18px; box-shadow: 0 8px 25px rgba(0,0,0,0.03); border: 1px solid #fce4ec; }
-        .title { color: var(--p); font-weight: 700; font-size: 17px; margin-bottom: 18px; display: block; border-right: 5px solid var(--p); padding-right: 12px; }
+        .card { background: #fff; border-radius: 20px; padding: 20px; margin-bottom: 18px; box-shadow: 0 8px 25px rgba(0,0,0,0.03); border: 1px solid #fce4ec; }
+        .title { color: var(--p); font-weight: 700; font-size: 16px; margin-bottom: 15px; display: block; border-right: 5px solid var(--p); padding-right: 10px; }
         
-        input, select { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #eee; border-radius: 12px; background: #fafafa; outline: none; font-weight: 600; user-select: auto; font-size: 15px; }
-        input:focus, select:focus { border-color: var(--p); background: #fff; box-shadow: 0 0 0 4px var(--pl); }
+        input, select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 12px; background: #fafafa; outline: none; font-weight: 600; user-select: auto; font-size: 14px; }
+        input:focus, select:focus { border-color: var(--p); background: #fff; box-shadow: 0 0 0 3px var(--pl); }
         
-        button { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+        button { width: 100%; padding: 14px; border: none; border-radius: 12px; font-weight: 700; font-size: 15px; cursor: pointer; transition: all 0.2s; }
         button:active { transform: scale(0.97); }
         .btn-p { background: linear-gradient(135deg, var(--p), #a8486e); color: #fff; box-shadow: 0 4px 15px rgba(194, 89, 131, 0.3); }
         .btn-out { background: #e74c3c; color: #fff; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2); }
-        .btn-save { background: var(--s); color: #fff; margin-top: 15px; }
+        .btn-save { background: var(--s); color: #fff; margin-top: 10px; }
         
-        .flex-row { display: flex; gap: 12px; }
+        .flex-row { display: flex; gap: 10px; }
         .flex-row > * { flex: 1; }
 
-        table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-        th { background: var(--pl); padding: 12px; text-align: right; color: var(--s); border-radius: 8px 8px 0 0; }
-        td { padding: 12px; border-bottom: 1px solid #f5f5f5; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+        th { background: var(--pl); padding: 10px; text-align: right; color: var(--s); border-radius: 8px 8px 0 0; }
+        td { padding: 10px; border-bottom: 1px solid #f5f5f5; }
 
-        .stats { display: flex; justify-content: space-between; text-align: center; margin-bottom: 20px; background: #fafafa; padding: 15px; border-radius: 15px; border: 1px dashed #ddd; }
+        .stats { display: flex; justify-content: space-between; text-align: center; margin-bottom: 15px; background: #fafafa; padding: 12px; border-radius: 15px; border: 1px dashed #ddd; }
         .stats div { flex: 1; }
-        .stats span { display: block; font-size: 20px; font-weight: 800; margin-top: 5px; }
+        .stats span { display: block; font-size: 18px; font-weight: 800; margin-top: 5px; }
 
         .nav { position: fixed; bottom: 0; width: 100%; background: var(--glass); backdrop-filter: blur(15px); display: flex; box-shadow: 0 -5px 25px rgba(0,0,0,0.06); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255,255,255,0.5); }
-        .nav div { flex: 1; text-align: center; padding: 18px; color: #999; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .nav div { flex: 1; text-align: center; padding: 15px; color: #999; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 13px; }
         .nav div.active { color: var(--p); border-top: 3px solid var(--p); background: rgba(252, 228, 236, 0.5); }
         
         .hidden { display: none !important; }
-        .low-stock { color: #e74c3c; font-weight: 700; background: #fdf2f2; padding: 3px 8px; border-radius: 8px; }
+        .low-stock { color: #e74c3c; font-weight: 700; background: #fdf2f2; padding: 2px 6px; border-radius: 6px; }
 
-        #toast { visibility: hidden; min-width: 280px; background: rgba(51, 51, 51, 0.95); backdrop-filter: blur(10px); color: #fff; text-align: center; border-radius: 30px; padding: 15px 20px; position: fixed; z-index: 9999; left: 50%; bottom: 80px; transform: translateX(-50%) translateY(20px); font-size: 15px; font-weight: bold; opacity: 0; transition: all 0.4s; }
+        #toast { visibility: hidden; min-width: 250px; background: rgba(51, 51, 51, 0.95); color: #fff; text-align: center; border-radius: 30px; padding: 12px 20px; position: fixed; z-index: 9999; left: 50%; bottom: 80px; transform: translateX(-50%) translateY(20px); font-size: 14px; font-weight: bold; opacity: 0; transition: all 0.4s; }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
         
-        /* إعدادات الطباعة للـ PDF */
+        /* =========================================================
+           إعدادات الطباعة للـ PDF (محمية ومفصولة تماماً عن الموقع)
+           ========================================================= */
         @media print {
-            body * { visibility: hidden; }
-            #print-area, #print-area * { visibility: visible; }
-            #print-area { position: absolute; left: 0; top: 0; width: 100%; padding: 20px; font-family: 'Tajawal', sans-serif; }
-            .no-print { display: none !important; }
+            body { background: #fff !important; margin: 0; padding: 0; }
+            /* إخفاء كل الموقع وقت الطباعة */
+            header, .container, .nav, #toast { display: none !important; }
+            
+            /* إظهار ورقة الطباعة فقط */
+            #print-area { display: block !important; position: absolute; left: 0; top: 0; width: 100%; padding: 20px; background: #fff; color: #000; }
+            
+            .print-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+            .print-info { display: flex; justify-content: space-between; margin-bottom: 15px; font-weight: bold; font-size: 14px; }
+            .print-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+            .print-table th, .print-table td { border: 1px solid #ccc; padding: 8px; text-align: center; font-size: 12px; }
+            .print-table th { background: #f0f0f0 !important; -webkit-print-color-adjust: exact; }
+            .print-total-box { border: 2px solid #000; padding: 12px; font-size: 16px; font-weight: bold; width: max-content; background: #fafafa !important; -webkit-print-color-adjust: exact; }
+            .print-footer { text-align: center; margin-top: 40px; color: #555; font-size: 12px; }
+            .print-logo { width: 50px; height: 50px; border-radius: 50%; border: 1px solid #ccc; display: block; margin: 10px auto; }
         }
-        
-        /* تنسيق ورقة الطباعة المخفية */
-        #print-area { background: #fff; color: #000; }
-        .print-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; }
-        .print-info { display: flex; justify-content: space-between; margin-bottom: 20px; font-weight: bold; }
-        .print-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
-        .print-table th, .print-table td { border: 1px solid #ccc; padding: 10px; text-align: center; }
-        .print-table th { background: #f5f5f5; font-weight: bold; }
-        .print-total-box { border: 2px solid #000; padding: 15px; font-size: 18px; font-weight: bold; width: fit-content; margin-right: auto; background: #f9f9f9; }
-        .print-footer { text-align: center; margin-top: 50px; color: #666; font-size: 14px; position: relative; }
-        .print-logo { width: 60px; height: 60px; border-radius: 50%; position: absolute; left: 20px; bottom: 0; border: 1px solid #ccc; }
     </style>
 </head>
 <body>
@@ -84,8 +86,8 @@
 
 <div id="print-area" class="hidden">
     <div class="print-header">
-        <h1 style="margin: 0; font-size: 24px;">محلات أيتـن Aytin</h1>
-        <p style="margin: 5px 0 0 0; font-size: 16px; color: #555;">كشف حساب وردية مفصل</p>
+        <h1 style="margin: 0; font-size: 22px;">محلات أيتـن للطرح والكارينا</h1>
+        <p style="margin: 5px 0 0 0; font-size: 14px; color: #555;">كشف حساب وردية مفصل</p>
     </div>
     <div class="print-info">
         <div id="p-date">التاريخ: </div>
@@ -111,35 +113,36 @@
     </div>
 </div>
 
-<header class="no-print">
+<header>
     <div class="role-btn" onclick="toggleRole()">المدير 🔒</div>
     <img src="icon.png" alt="Aytin" onerror="this.src='https://via.placeholder.com/60/c25983/fff?text=A'">
-    <h2 style="margin:0; color:var(--p); font-size:20px;">أيتـن Aytin <span id="role-text" style="font-size:12px; color:#888;">(كاشير)</span></h2>
+    <h2 style="margin:0; color:var(--p); font-size:18px;">أيتـن Aytin <span id="role-text" style="font-size:11px; color:#888;">(كاشير)</span></h2>
 </header>
 
-<div class="container no-print">
+<div class="container">
+    
     <div id="cashier-tab">
         <div class="card">
-            <span class="title">تسجيل مبيعات الوردية 🛒</span>
+            <span class="title">مبيعات الوردية 🛒</span>
             <select id="pos-model"></select>
             <div class="flex-row">
                 <input type="number" id="pos-qty" placeholder="العدد" value="1" min="1" style="flex: 0.35;">
-                <input type="number" id="pos-price" placeholder="سعر القطعة (ج.م)">
+                <input type="number" id="pos-price" placeholder="سعر القطعة (ج)">
             </div>
-            <button class="btn-p" onclick="sellItem()">تأكيد البيع وخصم البضاعة</button>
+            <button class="btn-p" onclick="sellItem()">تأكيد البيع</button>
         </div>
 
         <div class="card">
-            <span class="title" style="color:#e74c3c; border-color:#e74c3c;">المصروفات اليومية 💸</span>
+            <span class="title" style="color:#e74c3c; border-color:#e74c3c;">المصروفات 💸</span>
             <div class="flex-row">
-                <input type="text" id="out-desc" placeholder="البيان (ضيافة، نقل...)">
+                <input type="text" id="out-desc" placeholder="البيان">
                 <input type="number" id="out-val" placeholder="المبلغ">
             </div>
             <button class="btn-out" onclick="addExpense()">سجل مصروف (-)</button>
         </div>
 
         <div class="card">
-            <span class="title">يومية الوردية الحالية</span>
+            <span class="title">اليومية الحالية</span>
             <div class="stats">
                 <div>مبيعات<br><span id="stat-in" style="color:#2ecc71">0</span></div>
                 <div>مصروفات<br><span id="stat-out" style="color:#e74c3c">0</span></div>
@@ -149,27 +152,46 @@
                 <thead><tr><th>البيان</th><th>المبلغ</th><th>الوقت</th></tr></thead>
                 <tbody id="ledger-body"></tbody>
             </table>
-            <button class="btn-save" onclick="saveAndResetShift()">📥 حفظ وتقفيل الوردية (تصفير PDF)</button>
+            <button class="btn-save" onclick="triggerPrintAndReset()">📥 حفظ الـ PDF وتصفير الوردية</button>
         </div>
     </div>
 
     <div id="admin-tab" class="hidden">
+        
+        <div class="card" style="border:2px solid var(--s);">
+            <span class="title" style="color:var(--s); border-color:var(--s);">أرشيف اليوميات 📁</span>
+            <select id="archive-select" onchange="viewArchive()">
+                <option value="">-- اختر وردية قديمة --</option>
+            </select>
+            
+            <div id="archive-details" class="hidden" style="margin-top: 15px; border-top: 1px dashed #ccc; padding-top: 10px;">
+                <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--s); margin-bottom:10px;">
+                    <span>صافي الوردية:</span>
+                    <span id="archive-net">0 ج</span>
+                </div>
+                <table>
+                    <thead><tr><th>البيان</th><th>المبلغ</th><th>الوقت</th></tr></thead>
+                    <tbody id="archive-body"></tbody>
+                </table>
+            </div>
+        </div>
+
         <div class="card">
-            <span class="title">تحليل مبيعات الوردية 📊</span>
-            <div style="position: relative; height:250px; width:100%;">
+            <span class="title">تحليل مبيعات الوردية الحالية 📊</span>
+            <div style="position: relative; height:220px; width:100%;">
                 <canvas id="salesChart"></canvas>
             </div>
         </div>
 
-        <div class="card" style="border:2px solid var(--p);">
-            <span class="title">تغذية المخزن 📦</span>
-            <input type="text" id="adm-model" placeholder="اسم الموديل الجديد أو المتاح">
-            <input type="number" id="adm-qty" placeholder="الكمية الواردة">
-            <button class="btn-p" onclick="addStock()">تحديث رصيد المخزن</button>
-        </div>
-
         <div class="card">
-            <span class="title">جرد المخزن 🔍</span>
+            <span class="title">تغذية وجرد المخزن 📦</span>
+            <div class="flex-row">
+                <input type="text" id="adm-model" placeholder="اسم الموديل">
+                <input type="number" id="adm-qty" placeholder="الكمية" style="flex:0.5;">
+            </div>
+            <button class="btn-p" onclick="addStock()">تحديث رصيد المخزن</button>
+            
+            <hr style="border:0; border-top:1px dashed #eee; margin:15px 0;">
             <input type="text" id="search-stock" placeholder="ابحث عن موديل..." onkeyup="filterStock()">
             <table>
                 <thead><tr><th>الموديل</th><th>الكمية المتاحة</th></tr></thead>
@@ -180,7 +202,7 @@
 
 </div>
 
-<nav class="nav no-print">
+<nav class="nav">
     <div class="active" id="nav-cashier" onclick="switchTab('cashier')">شاشة البيع</div>
     <div id="nav-admin" onclick="switchTab('admin')">لوحة الإدارة</div>
 </nav>
@@ -206,6 +228,7 @@
     const todayDate = new Date().toLocaleDateString('en-CA'); 
     const displayDate = new Date().toLocaleDateString('ar-EG');
     let currentShiftData = null; 
+    let archivesData = null;
     let salesChartInstance = null;
 
     window.showToast = (msg, type = 'success') => {
@@ -241,12 +264,10 @@
         document.getElementById('nav-cashier').classList.toggle('active', tab === 'cashier');
         document.getElementById('nav-admin').classList.toggle('active', tab === 'admin');
         
-        // تأخير بسيط عشان الـ Canvas ياخد حجمه الطبيعي قبل ما يترسم
-        if(tab === 'admin') {
-            setTimeout(() => { updateChart(); }, 150);
-        }
+        if(tab === 'admin') { setTimeout(() => { updateChart(); }, 150); }
     };
 
+    // ---------------- المخزن ----------------
     window.addStock = () => {
         const model = document.getElementById('adm-model').value.trim();
         const qty = Number(document.getElementById('adm-qty').value);
@@ -281,13 +302,14 @@
         }
     });
 
+    // ---------------- البيع والمصروفات ----------------
     window.sellItem = () => {
         const sel = document.getElementById('pos-model');
         const pricePerPiece = Number(document.getElementById('pos-price').value);
         const qty = Number(document.getElementById('pos-qty').value);
 
         if(!sel.value || !qty || qty <= 0 || !pricePerPiece || pricePerPiece <= 0) {
-            return showToast("تأكد من إدخال العدد والسعر!", "error");
+            return showToast("أدخل العدد والسعر بشكل صحيح!", "error");
         }
 
         const modelName = sel.options[sel.selectedIndex].text;
@@ -295,20 +317,11 @@
         const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 
         push(ref(db, `ledgers/${todayDate}`), { 
-            title: `[قطعة] ${modelName}`, 
-            amount: totalPrice, 
-            type: 'in', 
-            time: time, 
-            model: modelName, 
-            qty: qty,
-            pricePerPiece: pricePerPiece
+            title: `[قطعة] ${modelName}`, amount: totalPrice, type: 'in', time: time, model: modelName, qty: qty, pricePerPiece: pricePerPiece 
         });
-        
         update(ref(db, `inventory/${sel.value}`), { stock: increment(-qty) });
         showToast(`تم بيع ${qty} قطعة وتسجيلها في اليومية`);
-        
-        document.getElementById('pos-price').value = '';
-        document.getElementById('pos-qty').value = '1';
+        document.getElementById('pos-price').value = ''; document.getElementById('pos-qty').value = '1';
     };
 
     window.addExpense = () => {
@@ -318,7 +331,6 @@
         
         const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
         push(ref(db, `ledgers/${todayDate}`), { title: `[مصروف] ${desc}`, amount: -Math.abs(val), type: 'out', time: time });
-        
         document.getElementById('out-desc').value = ''; document.getElementById('out-val').value = '';
         showToast("تم تسجيل المصروف", "error");
     };
@@ -338,95 +350,113 @@
         document.getElementById('stat-in').innerText = totalIn;
         document.getElementById('stat-out').innerText = totalOut;
         document.getElementById('stat-net').innerText = totalIn - totalOut;
-        
-        // التحديث لو الإدمن فاتح التاب
-        if(isAdmin && document.getElementById('admin-tab').classList.contains('hidden') === false) {
-            updateChart();
-        }
+        if(isAdmin && document.getElementById('admin-tab').classList.contains('hidden') === false) updateChart();
     });
 
     const updateChart = () => {
         if(!currentShiftData) return;
-        const salesByModel = {};
-        let hasData = false;
+        const salesByModel = {}; let hasData = false;
         for(let key in currentShiftData) {
             const entry = currentShiftData[key];
-            if(entry.type === 'in' && entry.model) {
-                salesByModel[entry.model] = (salesByModel[entry.model] || 0) + entry.qty;
-                hasData = true;
-            }
+            if(entry.type === 'in' && entry.model) { salesByModel[entry.model] = (salesByModel[entry.model] || 0) + entry.qty; hasData = true; }
         }
-        
         if(!hasData) return;
-
         const canvas = document.getElementById('salesChart');
         if(!canvas) return;
-        
         const ctx = canvas.getContext('2d');
         if(salesChartInstance) salesChartInstance.destroy();
-        
         salesChartInstance = new Chart(ctx, {
             type: 'doughnut',
-            data: {
-                labels: Object.keys(salesByModel),
-                datasets: [{ 
-                    data: Object.values(salesByModel), 
-                    backgroundColor: ['#c25983', '#f48fb1', '#4a148c', '#ce93d8', '#2ecc71'] 
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'right', labels: {font:{family:'Tajawal'}} } } 
-            }
+            data: { labels: Object.keys(salesByModel), datasets: [{ data: Object.values(salesByModel), backgroundColor: ['#c25983', '#f48fb1', '#4a148c', '#ce93d8', '#2ecc71'] }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: {font:{family:'Tajawal'}} } } }
         });
     };
 
-    window.saveAndResetShift = () => {
-        if(!currentShiftData) return showToast("الوردية فارغة، مفيش حاجة تتقفل!", "error");
-        if(!confirm("تأكيد: هيتم طباعة الـ PDF وتصفير الشاشة نهائياً عشان تبدأ وردية جديدة. متأكد؟")) return;
-        
-        // 1. أرشفة الداتا الأول عشان نضمن إنها متضيعش
-        const shiftId = Date.now();
-        set(ref(db, `archives/${todayDate}_Shift_${shiftId}`), currentShiftData).then(() => {
-            
-            // 2. تجهيز ورقة الطباعة (PDF)
-            document.getElementById('p-date').innerText = `التاريخ: ${displayDate}`;
-            const pBody = document.getElementById('p-tbody');
-            pBody.innerHTML = '';
-            
-            for(let key in currentShiftData) {
-                const entry = currentShiftData[key];
-                const timeStr = `${displayDate} - ${entry.time}`;
-                let qtyPriceStr = '-';
-                if(entry.type === 'in') {
-                    qtyPriceStr = `العدد: ${entry.qty} × ${entry.pricePerPiece} ج`;
-                }
-                
-                pBody.innerHTML += `<tr>
-                    <td style="text-align: right;">${entry.title}</td>
-                    <td>${timeStr}</td>
-                    <td>${qtyPriceStr}</td>
-                    <td style="font-weight:bold;">${Math.abs(entry.amount)} ج</td>
-                </tr>`;
+    // ---------------- الأرشيف (للمدير) ----------------
+    onValue(ref(db, 'archives'), (snap) => {
+        archivesData = snap.val();
+        const sel = document.getElementById('archive-select');
+        sel.innerHTML = '<option value="">-- اختر وردية قديمة --</option>';
+        if(archivesData) {
+            // ترتيب الأرشيف من الأحدث للأقدم
+            const keys = Object.keys(archivesData).sort().reverse();
+            for(let key of keys) {
+                // شكل التاريخ في الاختيارات
+                const displayKey = key.replace('_Shift_', ' | وقت التقفيل: ').replace(/-/g, '/');
+                sel.innerHTML += `<option value="${key}">${displayKey}</option>`;
             }
+        }
+    });
+
+    window.viewArchive = () => {
+        const sel = document.getElementById('archive-select').value;
+        const details = document.getElementById('archive-details');
+        const body = document.getElementById('archive-body');
+        
+        if(!sel || !archivesData || !archivesData[sel]) {
+            details.classList.add('hidden');
+            return;
+        }
+
+        details.classList.remove('hidden');
+        const shiftData = archivesData[sel];
+        let net = 0; body.innerHTML = '';
+        
+        for(let key in shiftData) {
+            const entry = shiftData[key];
+            net += entry.amount;
+            const color = entry.amount > 0 ? '#2ecc71' : '#e74c3c';
+            body.innerHTML += `<tr><td>${entry.title}</td><td style="color:${color}; font-weight:bold;">${Math.abs(entry.amount)}</td><td style="font-size:11px; color:#888;">${entry.time}</td></tr>`;
+        }
+        document.getElementById('archive-net').innerText = `${net} ج.م`;
+    };
+
+    // ---------------- الطباعة والتقفيل ----------------
+    window.triggerPrintAndReset = () => {
+        if(!currentShiftData) return showToast("الوردية فارغة، مفيش حاجة تتحفظ!", "error");
+        
+        // 1. تجهيز ورقة الطباعة
+        document.getElementById('p-date').innerText = `التاريخ: ${displayDate}`;
+        const pBody = document.getElementById('p-tbody');
+        pBody.innerHTML = '';
+        
+        for(let key in currentShiftData) {
+            const entry = currentShiftData[key];
+            const timeStr = `${displayDate} - ${entry.time}`;
+            let qtyPriceStr = '-';
+            if(entry.type === 'in') qtyPriceStr = `العدد: ${entry.qty} × ${entry.pricePerPiece} ج`;
             
-            document.getElementById('p-total').innerText = `الإجمالي المطلوب سداده: ${document.getElementById('stat-net').innerText} ج.م`;
+            pBody.innerHTML += `<tr>
+                <td style="text-align: right;">${entry.title}</td>
+                <td>${timeStr}</td>
+                <td>${qtyPriceStr}</td>
+                <td style="font-weight:bold;">${Math.abs(entry.amount)} ج</td>
+            </tr>`;
+        }
+        document.getElementById('p-total').innerText = `الإجمالي الصافي: ${document.getElementById('stat-net').innerText} ج.م`;
+        
+        // 2. إظهار ورقة الطباعة واستدعاء أمر الطباعة الخاص بالمتصفح
+        const printArea = document.getElementById('print-area');
+        printArea.classList.remove('hidden');
+        
+        setTimeout(() => {
+            window.print();
             
-            // 3. مسح الداتا من الخزنة
-            remove(ref(db, `ledgers/${todayDate}`)).then(() => { 
+            // 3. رسالة تأكيد الأرشفة بعد إغلاق نافذة الطباعة
+            setTimeout(() => {
+                printArea.classList.add('hidden');
                 
-                // 4. إظهار نافذة الطباعة (حفظ كـ PDF)
-                document.getElementById('print-area').classList.remove('hidden');
-                setTimeout(() => {
-                    window.print();
-                    document.getElementById('print-area').classList.add('hidden');
-                    showToast("تم تصدير الـ PDF بنجاح وتصفير الوردية!"); 
-                }, 500); // تأخير بسيط عشان المتصفح يلحق يرسم الورقة
-                
-            }).catch(e => showToast("حدث خطأ أثناء التصفير", "error"));
-            
-        }).catch(e => showToast("حدث خطأ أثناء الاتصال بقاعدة البيانات", "error"));
+                if(confirm("هل تم حفظ الـ PDF بنجاح لترحيل وتصفير الوردية؟ (اضغط OK لتصفير الشاشة)")) {
+                    const shiftId = new Date().toLocaleTimeString('ar-EG', {hour12:false}).replace(/:/g, '-');
+                    
+                    set(ref(db, `archives/${todayDate}_Shift_${shiftId}`), currentShiftData).then(() => {
+                        remove(ref(db, `ledgers/${todayDate}`)).then(() => { 
+                            showToast("تم ترحيل الوردية بنجاح للأرشيف!"); 
+                        });
+                    });
+                }
+            }, 1000); 
+        }, 500); 
     };
 </script>
 </body>
