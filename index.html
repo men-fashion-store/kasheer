@@ -2,57 +2,72 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أيتن - الإدارة الذكية</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#c25983">
+    
+    <title>أيتن - Aytin POS</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
-        :root { --p: #c25983; --pl: #fce4ec; --s: #4a148c; --bg: #fdfafb; }
-        * { box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
-        body { background: var(--bg); margin: 0; padding-bottom: 80px; color: #333; }
+        :root { --p: #c25983; --pl: #fce4ec; --s: #4a148c; --bg: #fdfafb; --glass: rgba(255, 255, 255, 0.85); }
+        * { box-sizing: border-box; font-family: 'Tajawal', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { background: var(--bg); margin: 0; padding-bottom: 90px; color: #333; overflow-x: hidden; }
         
-        header { background: #fff; padding: 15px; text-align: center; border-bottom: 3px solid var(--p); box-shadow: 0 4px 15px rgba(194, 89, 131, 0.1); position: sticky; top: 0; z-index: 100; }
-        header img { height: 55px; border-radius: 50%; border: 2px solid var(--p); margin-bottom: 5px; }
+        header { background: var(--glass); backdrop-filter: blur(10px); padding: 15px; text-align: center; border-bottom: 2px solid rgba(194, 89, 131, 0.2); position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+        header img { height: 50px; border-radius: 50%; border: 2px solid var(--p); margin-bottom: 5px; }
+        .role-btn { position: absolute; top: 18px; left: 15px; font-size: 11px; background: var(--white); padding: 6px 12px; border-radius: 20px; color: var(--p); font-weight: bold; cursor: pointer; border: 1px solid var(--p); transition: 0.3s; }
         
-        .role-btn { position: absolute; top: 15px; left: 15px; font-size: 11px; background: var(--pl); padding: 5px 10px; border-radius: 20px; color: var(--p); font-weight: bold; cursor: pointer; border: 1px solid var(--p); }
+        .container { padding: 15px; max-width: 600px; margin: auto; animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .container { padding: 15px; max-width: 500px; margin: auto; }
-        .card { background: #fff; border-radius: 15px; padding: 20px; margin-bottom: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.04); border: 1px solid #fce4ec; }
-        .title { color: var(--p); font-weight: bold; font-size: 16px; margin-bottom: 15px; display: block; border-right: 4px solid var(--p); padding-right: 10px; }
+        .card { background: #fff; border-radius: 20px; padding: 22px; margin-bottom: 18px; box-shadow: 0 8px 25px rgba(0,0,0,0.03); border: 1px solid #fce4ec; }
+        .title { color: var(--p); font-weight: 700; font-size: 17px; margin-bottom: 18px; display: block; border-right: 5px solid var(--p); padding-right: 12px; }
         
-        input, select { width: 100%; padding: 12px; margin-bottom: 12px; border: 1px solid #eee; border-radius: 10px; background: #fafafa; outline: none; transition: 0.3s; font-weight: bold; }
-        input:focus, select:focus { border-color: var(--p); background: #fff; box-shadow: 0 0 0 3px var(--pl); }
+        input, select { width: 100%; padding: 14px; margin-bottom: 15px; border: 1px solid #eee; border-radius: 12px; background: #fafafa; outline: none; font-weight: 600; user-select: auto; font-size: 15px; }
+        input:focus, select:focus { border-color: var(--p); background: #fff; box-shadow: 0 0 0 4px var(--pl); }
         
-        button { width: 100%; padding: 12px; border: none; border-radius: 10px; font-weight: bold; font-size: 15px; cursor: pointer; transition: 0.2s; }
-        .btn-p { background: var(--p); color: #fff; }
-        .btn-out { background: #e74c3c; color: #fff; }
+        button { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; transition: all 0.2s; }
+        button:active { transform: scale(0.97); }
+        .btn-p { background: linear-gradient(135deg, var(--p), #a8486e); color: #fff; box-shadow: 0 4px 15px rgba(194, 89, 131, 0.3); }
+        .btn-out { background: #e74c3c; color: #fff; box-shadow: 0 4px 15px rgba(231, 76, 60, 0.2); }
         .btn-save { background: var(--s); color: #fff; margin-top: 15px; }
         
-        .flex-row { display: flex; gap: 10px; }
+        .flex-row { display: flex; gap: 12px; }
         .flex-row > * { flex: 1; }
 
         table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-        th { background: var(--pl); padding: 10px; text-align: right; color: var(--s); border-radius: 5px 5px 0 0; }
-        td { padding: 10px; border-bottom: 1px solid #eee; }
+        th { background: var(--pl); padding: 12px; text-align: right; color: var(--s); border-radius: 8px 8px 0 0; }
+        td { padding: 12px; border-bottom: 1px solid #f5f5f5; }
 
-        .stats { display: flex; justify-content: space-between; text-align: center; margin-bottom: 15px; background: #fff; padding: 10px; border-radius: 10px; border: 1px dashed var(--p); }
+        .stats { display: flex; justify-content: space-between; text-align: center; margin-bottom: 20px; background: #fafafa; padding: 15px; border-radius: 15px; border: 1px dashed #ddd; }
         .stats div { flex: 1; }
-        .stats span { display: block; font-size: 18px; font-weight: bold; margin-top: 5px; }
+        .stats span { display: block; font-size: 20px; font-weight: 800; margin-top: 5px; }
 
-        .nav { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); z-index: 1000; }
-        .nav div { flex: 1; text-align: center; padding: 15px; color: #aaa; font-weight: bold; cursor: pointer; }
-        .nav div.active { color: var(--p); border-top: 3px solid var(--p); background: var(--pl); }
+        .nav { position: fixed; bottom: 0; width: 100%; background: var(--glass); backdrop-filter: blur(15px); display: flex; box-shadow: 0 -5px 25px rgba(0,0,0,0.06); z-index: 1000; padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid rgba(255,255,255,0.5); }
+        .nav div { flex: 1; text-align: center; padding: 18px; color: #999; font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .nav div.active { color: var(--p); border-top: 3px solid var(--p); background: rgba(252, 228, 236, 0.5); }
         
-        .hidden { display: none; }
-        .low-stock { color: #e74c3c; font-weight: bold; }
+        .hidden { display: none !important; }
+        .low-stock { color: #e74c3c; font-weight: 700; background: #fdf2f2; padding: 3px 8px; border-radius: 8px; }
+
+        #toast { visibility: hidden; min-width: 280px; background: rgba(51, 51, 51, 0.95); backdrop-filter: blur(10px); color: #fff; text-align: center; border-radius: 30px; padding: 15px 20px; position: fixed; z-index: 9999; left: 50%; bottom: 80px; transform: translateX(-50%) translateY(20px); font-size: 15px; font-weight: bold; opacity: 0; transition: all 0.4s; }
+        #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
     </style>
 </head>
 <body>
 
+<div id="toast"></div>
+
 <header>
-    <div class="role-btn" onclick="toggleRole()">لوحة الإدارة 🔒</div>
-    <img src="icon.png" alt="لوجو" onerror="this.src='https://via.placeholder.com/60/c25983/fff?text=A'">
+    <div class="role-btn" onclick="toggleRole()">المدير 🔒</div>
+    <img src="icon.png" alt="Aytin" onerror="this.src='https://via.placeholder.com/60/c25983/fff?text=A'">
     <h2 style="margin:0; color:var(--p); font-size:20px;">أيتـن Aytin <span id="role-text" style="font-size:12px; color:#888;">(كاشير)</span></h2>
 </header>
 
@@ -60,21 +75,19 @@
     
     <div id="cashier-tab">
         <div class="card">
-            <span class="title">تسجيل مبيعات 🛍️</span>
+            <span class="title">نقطة البيع السريعة (POS) 🛒</span>
             <select id="pos-model"></select>
-            
             <div class="flex-row">
-                <input type="number" id="pos-qty" placeholder="العدد" value="1" min="1" style="flex: 0.4;">
-                <input type="number" id="pos-price" placeholder="سعر القطعة الواحدة (ج.م)">
+                <input type="number" id="pos-qty" placeholder="العدد" value="1" min="1" style="flex: 0.35;">
+                <input type="number" id="pos-price" placeholder="سعر القطعة (ج.م)">
             </div>
-            
-            <button class="btn-p" onclick="sellItem()">تأكيد البيع وخصم القطع</button>
+            <button class="btn-p" onclick="sellItem()">تسجيل البيع بالوقت والتاريخ</button>
         </div>
 
         <div class="card">
-            <span class="title" style="color:#e74c3c; border-color:#e74c3c;">تسجيل خارج / مصروفات 💸</span>
+            <span class="title" style="color:#e74c3c; border-color:#e74c3c;">المصروفات اليومية 💸</span>
             <div class="flex-row">
-                <input type="text" id="out-desc" placeholder="البيان (غداء، شاي...)">
+                <input type="text" id="out-desc" placeholder="البيان (ضيافة، أكياس)">
                 <input type="number" id="out-val" placeholder="المبلغ">
             </div>
             <button class="btn-out" onclick="addExpense()">سجل مصروف (-)</button>
@@ -91,20 +104,26 @@
                 <thead><tr><th>البيان</th><th>المبلغ</th><th>الوقت</th></tr></thead>
                 <tbody id="ledger-body"></tbody>
             </table>
-            <button class="btn-save" onclick="saveShiftPDF()">📥 حفظ وتقفيل اليومية (PDF)</button>
+            <button class="btn-save" onclick="saveAndResetShift()">📥 حفظ وتقفيل كشف اليومية (PDF)</button>
         </div>
     </div>
 
     <div id="admin-tab" class="hidden">
-        <div class="card" style="border:2px solid var(--s);">
-            <span class="title" style="color:var(--s); border-color:var(--s);">إضافة للمخزن 📦 (صلاحية مدير)</span>
-            <input type="text" id="adm-model" placeholder="اسم الموديل (مثال: طرحة سوري)">
-            <input type="number" id="adm-qty" placeholder="الكمية المراد إضافتها">
-            <button style="background:var(--s); color:#fff;" onclick="addStock()">إضافة للمخزن</button>
+        <div class="card">
+            <span class="title">تحليل مبيعات الوردية 📊</span>
+            <canvas id="salesChart" height="200"></canvas>
+        </div>
+
+        <div class="card" style="border:2px solid var(--p);">
+            <span class="title">تغذية المخزن 📦</span>
+            <input type="text" id="adm-model" placeholder="اسم الموديل الجديد أو المتاح">
+            <input type="number" id="adm-qty" placeholder="الكمية الواردة">
+            <button class="btn-p" onclick="addStock()">تحديث رصيد المخزن</button>
         </div>
 
         <div class="card">
-            <span class="title">جرد المخزن الحالي</span>
+            <span class="title">جرد المخزن 🔍</span>
+            <input type="text" id="search-stock" placeholder="ابحث عن موديل..." onkeyup="filterStock()">
             <table>
                 <thead><tr><th>الموديل</th><th>الكمية المتاحة</th></tr></thead>
                 <tbody id="stock-body"></tbody>
@@ -115,13 +134,13 @@
 </div>
 
 <nav class="nav">
-    <div class="active" id="nav-cashier" onclick="switchTab('cashier')">شاشة الموظف</div>
-    <div id="nav-admin" onclick="switchTab('admin')">المخزن (المدير)</div>
+    <div class="active" id="nav-cashier" onclick="switchTab('cashier')">شاشة البيع</div>
+    <div id="nav-admin" onclick="switchTab('admin')">لوحة الإدارة</div>
 </nav>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getDatabase, ref, push, onValue, update, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { getDatabase, ref, push, onValue, update, increment, set, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
     const config = {
         apiKey: "AIzaSyCZTnzsDjfQsdsUuzwkwK4h_zTbfQqKWgY",
@@ -137,184 +156,262 @@
     const db = getDatabase(app);
 
     let isAdmin = false;
-    const todayDate = new Date().toISOString().split('T')[0];
+    const todayDate = new Date().toLocaleDateString('en-CA'); // صيغة YYYY-MM-DD
+    const displayDate = new Date().toLocaleDateString('ar-EG');
+    let currentShiftData = null; 
+    let salesChartInstance = null;
 
-    // تبديل الصلاحيات
+    window.showToast = (msg, type = 'success') => {
+        const toast = document.getElementById("toast");
+        toast.innerText = msg;
+        toast.style.backgroundColor = type === 'success' ? '#c25983' : '#e74c3c';
+        toast.className = `show`;
+        setTimeout(() => { toast.className = toast.className.replace(`show`, ""); }, 3000);
+    };
+
     window.toggleRole = () => {
         if(!isAdmin) {
-            let pass = prompt("برجاء إدخال باسورد الإدارة:");
-            if(pass === "12345") { // باسوورد المدير
+            let pass = prompt("باسورد الإدارة:");
+            if(pass === "12345") {
                 isAdmin = true;
-                document.getElementById('role-text').innerText = "(مدير)";
-                alert("تم تسجيل الدخول كمدير. يمكنك الآن تعديل المخزن.");
-            } else { alert("باسوورد خاطئ!"); }
+                document.getElementById('role-text').innerText = "(المدير)";
+                showToast("أهلاً بك في لوحة الإدارة");
+            } else { showToast("الباسورد غير صحيح!", "error"); }
         } else {
             isAdmin = false;
             document.getElementById('role-text').innerText = "(كاشير)";
             switchTab('cashier');
-            alert("تم العودة لوضع الكاشير.");
+            showToast("تم تسجيل الخروج");
         }
     };
 
     window.switchTab = (tab) => {
-        if(tab === 'admin' && !isAdmin) return alert("لازم تسجل كمدير الأول من الزرار اللي فوق 🔒");
+        if(tab === 'admin' && !isAdmin) return showToast("صلاحيات المدير مطلوبة 🔒", "error");
         document.getElementById('cashier-tab').classList.toggle('hidden', tab !== 'cashier');
         document.getElementById('admin-tab').classList.toggle('hidden', tab !== 'admin');
         document.getElementById('nav-cashier').classList.toggle('active', tab === 'cashier');
         document.getElementById('nav-admin').classList.toggle('active', tab === 'admin');
+        if(tab === 'admin') updateChart();
     };
 
-    // 1. الإدمن: إضافة كميات
     window.addStock = () => {
         const model = document.getElementById('adm-model').value.trim();
         const qty = Number(document.getElementById('adm-qty').value);
-        if(!model || !qty) return alert("برجاء كتابة الموديل والكمية!");
-
-        update(ref(db, 'inventory/' + model), {
-            name: model, stock: increment(qty)
-        }).then(() => {
-            alert("تم إضافة البضاعة للمخزن بنجاح!");
-            document.getElementById('adm-model').value = '';
-            document.getElementById('adm-qty').value = '';
+        if(!model || !qty) return showToast("بيانات ناقصة!", "error");
+        update(ref(db, 'inventory/' + model), { name: model, stock: increment(qty) }).then(() => {
+            showToast(`تم إضافة ${qty} قطعة للمخزن`);
+            document.getElementById('adm-model').value = ''; document.getElementById('adm-qty').value = '';
         });
     };
 
-    // جلب المخزن (للبيع والجرد)
+    window.filterStock = () => {
+        const filter = document.getElementById('search-stock').value.toLowerCase();
+        const trs = document.querySelectorAll('#stock-body tr');
+        trs.forEach(tr => {
+            const text = tr.getElementsByTagName("td")[0].innerText.toLowerCase();
+            tr.style.display = text.indexOf(filter) > -1 ? "" : "none";
+        });
+    };
+
     onValue(ref(db, 'inventory'), (snap) => {
         const data = snap.val();
         const sel = document.getElementById('pos-model');
         const sBody = document.getElementById('stock-body');
-        
         sel.innerHTML = '<option value="">-- اختر الموديل --</option>';
         sBody.innerHTML = '';
-        
         if(data) {
             for(let key in data) {
-                if(data[key].stock > 0) {
-                    sel.innerHTML += `<option value="${key}">${data[key].name}</option>`;
-                }
+                if(data[key].stock > 0) sel.innerHTML += `<option value="${key}">${data[key].name}</option>`;
                 const stockClass = data[key].stock < 5 ? 'low-stock' : '';
-                sBody.innerHTML += `<tr>
-                    <td>${data[key].name}</td>
-                    <td class="${stockClass}">${data[key].stock} قطعة</td>
-                </tr>`;
+                sBody.innerHTML += `<tr><td>${data[key].name}</td><td class="${stockClass}">${data[key].stock} ق</td></tr>`;
             }
         }
     });
 
-    // 2. الكاشير: بيع بالعدد والسعر
+    // تسجيل البيع بالثواني
     window.sellItem = () => {
         const sel = document.getElementById('pos-model');
         const pricePerPiece = Number(document.getElementById('pos-price').value);
         const qty = Number(document.getElementById('pos-qty').value);
 
-        if(!sel.value) return alert("اختر الموديل الأول!");
-        if(!qty || qty <= 0) return alert("اكتب العدد بشكل صحيح!");
-        if(!pricePerPiece || pricePerPiece <= 0) return alert("اكتب سعر القطعة صح!");
+        if(!sel.value || !qty || qty <= 0 || !pricePerPiece || pricePerPiece <= 0) {
+            return showToast("تأكد من إدخال العدد والسعر!", "error");
+        }
 
         const modelName = sel.options[sel.selectedIndex].text;
         const totalPrice = pricePerPiece * qty;
-        
-        // تسجيل اسم الصنف مع العدد في اليومية
-        const ledgerTitle = `بيع: ${modelName} (عدد ${qty})`;
-        const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
+        // صيغة الوقت بالثواني
+        const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
 
-        // إضافة لليومية بإجمالي السعر
-        push(ref(db, `ledgers/${todayDate}`), { title: ledgerTitle, amount: totalPrice, type: 'in', time });
+        push(ref(db, `ledgers/${todayDate}`), { 
+            title: `[مبيعات] ${modelName}`, 
+            amount: totalPrice, 
+            type: 'in', 
+            time: time, 
+            model: modelName, 
+            qty: qty,
+            pricePerPiece: pricePerPiece
+        });
         
-        // خصم العدد الكامل من المخزن
         update(ref(db, `inventory/${sel.value}`), { stock: increment(-qty) });
+        showToast(`تم بيع ${qty} قطعة وتسجيلها في اليومية`);
         
         document.getElementById('pos-price').value = '';
-        document.getElementById('pos-qty').value = '1'; // إرجاع العدد لـ 1 تلقائياً
-        alert(`تم بيع عدد ${qty} قطعة وتسجيل مبلغ ${totalPrice} ج.م في اليومية!`);
+        document.getElementById('pos-qty').value = '1';
     };
 
-    // 3. الكاشير: تسجيل خارج
     window.addExpense = () => {
         const desc = document.getElementById('out-desc').value.trim();
         const val = Number(document.getElementById('out-val').value);
-        if(!desc || !val) return alert("اكتب البيان والمبلغ!");
-
-        const title = "مصروف: " + desc;
-        const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'});
-
-        push(ref(db, `ledgers/${todayDate}`), { title: title, amount: -Math.abs(val), type: 'out', time });
+        if(!desc || !val) return showToast("البيانات غير مكتملة", "error");
         
-        document.getElementById('out-desc').value = '';
-        document.getElementById('out-val').value = '';
+        const time = new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+        push(ref(db, `ledgers/${todayDate}`), { title: `[مصروفات] ${desc}`, amount: -Math.abs(val), type: 'out', time: time });
+        
+        document.getElementById('out-desc').value = ''; document.getElementById('out-val').value = '';
+        showToast("تم تسجيل المصروف", "error");
     };
 
-    // جلب اليومية وحساب الصافي
     onValue(ref(db, `ledgers/${todayDate}`), (snap) => {
-        const data = snap.val();
+        currentShiftData = snap.val();
         const body = document.getElementById('ledger-body');
-        let totalIn = 0, totalOut = 0;
-        body.innerHTML = '';
-        
-        if(data) {
-            for(let key in data) {
-                const entry = data[key];
-                if(entry.amount > 0) totalIn += entry.amount;
-                else totalOut += Math.abs(entry.amount);
-
+        let totalIn = 0, totalOut = 0; body.innerHTML = '';
+        if(currentShiftData) {
+            for(let key in currentShiftData) {
+                const entry = currentShiftData[key];
+                if(entry.amount > 0) totalIn += entry.amount; else totalOut += Math.abs(entry.amount);
                 const color = entry.amount > 0 ? '#2ecc71' : '#e74c3c';
-                body.innerHTML += `<tr>
-                    <td>${entry.title}</td>
-                    <td style="color:${color}; font-weight:bold;">${Math.abs(entry.amount)}</td>
-                    <td style="font-size:11px; color:#888;">${entry.time}</td>
-                </tr>`;
+                body.innerHTML += `<tr><td>${entry.title}</td><td style="color:${color}; font-weight:bold;">${Math.abs(entry.amount)}</td><td style="font-size:11px; color:#888;">${entry.time}</td></tr>`;
             }
         }
-        
-        document.getElementById('stat-in').innerText = totalIn + " ج";
-        document.getElementById('stat-out').innerText = totalOut + " ج";
-        document.getElementById('stat-net').innerText = (totalIn - totalOut) + " ج";
+        document.getElementById('stat-in').innerText = totalIn;
+        document.getElementById('stat-out').innerText = totalOut;
+        document.getElementById('stat-net').innerText = totalIn - totalOut;
+        if(isAdmin) updateChart();
     });
 
-    // 4. استخراج التقرير وتقفيل اليومية
-    window.saveShiftPDF = () => {
-        if(!confirm("هتطبع يومية الوردية دلوقتي؟")) return;
+    const updateChart = () => {
+        if(!currentShiftData) return;
+        const salesByModel = {};
+        for(let key in currentShiftData) {
+            const entry = currentShiftData[key];
+            if(entry.type === 'in' && entry.model) {
+                salesByModel[entry.model] = (salesByModel[entry.model] || 0) + entry.qty;
+            }
+        }
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        if(salesChartInstance) salesChartInstance.destroy();
+        salesChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: Object.keys(salesByModel),
+                datasets: [{ data: Object.values(salesByModel), backgroundColor: ['#c25983', '#f48fb1', '#4a148c', '#ce93d8', '#2ecc71'] }]
+            },
+            options: { responsive: true, plugins: { legend: { position: 'right', labels: {font:{family:'Tajawal'}} } } }
+        });
+    };
+
+    // تصميم ورقة الـ A4 الاحترافية
+    window.saveAndResetShift = () => {
+        if(!currentShiftData) return showToast("الوردية فارغة!", "error");
+        if(!confirm("سيتم تصفير الوردية الحالية وتصدير كشف حساب مفصل، متأكد؟")) return;
         
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+        const { jsPDF } = window.jspdf; 
+        const doc = new jsPDF('p', 'mm', 'a4'); // مقاس A4
         
+        // استدعاء خط يدعم العربي
+        doc.addFont('https://fonts.gstatic.com/s/tajawal/v9/I7ak6P8n9lYF6iIw7yc.ttf', 'Tajawal', 'normal');
+        doc.setFont('Tajawal');
+
+        // الهيدر
         doc.setFontSize(22);
-        doc.setTextColor(194, 89, 131); 
-        doc.text("Aytin Daily Shift Report", 105, 20, { align: 'center' });
+        doc.setTextColor(0, 0, 0); 
+        doc.text("محلات أيتـن للطرح والكارينا", 105, 25, { align: 'center' });
+        doc.setFontSize(13);
+        doc.setTextColor(100, 100, 100);
+        doc.text("كشف حساب وردية مفصل", 105, 33, { align: 'center' });
+
+        // تفاصيل اليومية
+        doc.setFontSize(11);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`التاريخ: ${displayDate}`, 190, 45, { align: 'right' });
+        doc.text(`المسؤول: كاشير الوردية`, 20, 45, { align: 'left' });
+        
+        // خط فاصل
+        doc.setLineWidth(0.5);
+        doc.line(20, 48, 190, 48);
+
+        // تجهيز بيانات الجدول التفصيلي
+        const rows = [];
+        for(let key in currentShiftData) {
+            const entry = currentShiftData[key];
+            const timeDateStr = `${displayDate}\n${entry.time}`;
+            
+            let qtyPriceStr = '-';
+            if(entry.type === 'in') {
+                qtyPriceStr = `العدد: ${entry.qty} × ${entry.pricePerPiece} ج`;
+            }
+            
+            const totalStr = `${Math.abs(entry.amount)} ج`;
+            const titleStr = entry.title;
+
+            // الترتيب: الإجمالي | الكمية والسعر | التاريخ والوقت | البيان
+            rows.push([totalStr, qtyPriceStr, timeDateStr, titleStr]);
+        }
+
+        // رسم الجدول
+        doc.autoTable({
+            head: [['الإجمالي', 'الكمية والسعر', 'التاريخ والوقت', 'البيان (صنف / مصروف)']],
+            body: rows, 
+            startY: 55, 
+            theme: 'grid',
+            headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], font: 'Tajawal', halign: 'center' }, 
+            styles: { font: 'Tajawal', halign: 'center', valign: 'middle' },
+            columnStyles: { 3: { halign: 'right' } } // نخلي البيان يمين
+        });
+
+        // المربع الخاص بالإجمالي المطلوب سداده
+        const finalY = doc.lastAutoTable.finalY + 15;
+        const netValue = document.getElementById('stat-net').innerText;
+        
+        // رسم مستطيل للإجمالي
+        doc.setDrawColor(0, 0, 0);
+        doc.setFillColor(250, 250, 250);
+        doc.rect(120, finalY, 70, 12, 'FD'); 
         
         doc.setFontSize(14);
-        doc.setTextColor(50);
-        doc.text(`Date: ${todayDate}`, 105, 30, { align: 'center' });
+        doc.setTextColor(0, 0, 0);
+        doc.text(`الإجمالي الصافي: ${netValue} ج.م`, 185, finalY + 8, { align: 'right' });
 
-        const rows = [];
-        document.querySelectorAll('#ledger-body tr').forEach(tr => {
-            const tds = tr.querySelectorAll('td');
-            rows.push([tds[2].innerText, tds[1].innerText, tds[0].innerText]); 
-        });
+        // تذييل الصفحة
+        doc.setFontSize(10);
+        doc.setTextColor(150, 150, 150);
+        doc.text("شكراً لتعاملكم معنا - إدارة محلات أيتن", 105, finalY + 30, { align: 'center' });
+        doc.text("تم إصدار هذا الكشف آلياً", 105, finalY + 35, { align: 'center' });
 
-        doc.autoTable({
-            head: [['Time', 'Amount (EGP)', 'Description']],
-            body: rows,
-            startY: 40,
-            theme: 'grid',
-            headStyles: { fillColor: [194, 89, 131] },
-            styles: { halign: 'right' } 
-        });
-
-        const finalY = doc.lastAutoTable.finalY + 15;
-        const net = document.getElementById('stat-net').innerText;
-        doc.setFontSize(16);
-        doc.setTextColor(74, 20, 140);
-        doc.text(`Net Cash: ${net}`, 190, finalY, { align: 'right' });
-
+        // إضافة اللوجو الدائري تحت على الشمال
         const img = new Image();
         img.src = 'icon.png';
         img.onload = function() {
-            doc.addImage(img, 'PNG', 15, finalY - 10, 25, 25);
-            doc.save(`Aytin_Shift_${todayDate}.pdf`);
+            doc.addImage(img, 'PNG', 20, 260, 20, 20); // مقاس اللوجو ومكانه في الـ A4
+            doc.save(`Aytin_Report_${Date.now()}.pdf`);
+            resetAndArchive();
         };
-        if(!img.complete) doc.save(`Aytin_Shift_${todayDate}.pdf`);
+        
+        // لو الصورة محملتش يطبع من غيرها ويصفر
+        if(!img.complete) {
+            doc.save(`Aytin_Report_${Date.now()}.pdf`);
+            resetAndArchive();
+        }
+
+        // دالة التصفير والأرشفة
+        function resetAndArchive() {
+            set(ref(db, `archives/${todayDate}_Shift_${Date.now()}`), currentShiftData).then(() => {
+                remove(ref(db, `ledgers/${todayDate}`)).then(() => { 
+                    showToast("تم تصدير الـ PDF بنجاح وتصفير الوردية!"); 
+                });
+            });
+        }
     };
 </script>
 </body>
