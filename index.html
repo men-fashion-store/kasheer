@@ -9,8 +9,6 @@
     <title>أيتـن - Aytin POS Final</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <style>
         :root { --p: #c25983; --pl: #fce4ec; --s: #4a148c; --bg: #fdfafb; --glass: rgba(255, 255, 255, 0.95); --text: #333; }
@@ -19,18 +17,18 @@
         body { background: var(--bg); margin: 0; padding-bottom: 95px; color: var(--text); direction: rtl; overscroll-behavior-y: none; -webkit-overflow-scrolling: touch; }
         
         header { background: var(--glass); backdrop-filter: blur(12px); padding: 15px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-bottom: 1px solid rgba(194, 89, 131, 0.15); position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 30px rgba(0,0,0,0.03); }
-        header img { height: 55px; width: 55px; border-radius: 50%; border: 2px solid var(--p); object-fit: cover; margin-bottom: 8px; box-shadow: 0 2px 10px rgba(194, 89, 131, 0.2); }
-        header h2 { margin: 0; color: var(--p); font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
-        .role-btn { position: absolute; top: 20px; left: 15px; font-size: 11px; background: #fff; padding: 6px 14px; border-radius: 20px; color: var(--p); border: 1px solid var(--p); font-weight: 700; cursor: pointer; transition: all 0.2s ease; }
+        header img { height: 55px; width: 55px; border-radius: 50%; border: 2px solid var(--p); object-fit: cover; margin-bottom: 8px; }
+        header h2 { margin: 0; color: var(--p); font-size: 20px; font-weight: 800; }
+        .role-btn { position: absolute; top: 20px; left: 15px; font-size: 11px; background: #fff; padding: 6px 14px; border-radius: 20px; color: var(--p); border: 1px solid var(--p); font-weight: 700; cursor: pointer; transition: all 0.2s; }
         
         .container { padding: 15px; max-width: 600px; margin: auto; animation: fadeUp 0.4s ease-out forwards; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
-        .card { background: #fff; border-radius: 24px; padding: 22px; margin-bottom: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); border: 1px solid #fdf0f4; transition: transform 0.3s ease; }
+        .card { background: #fff; border-radius: 24px; padding: 22px; margin-bottom: 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.04); border: 1px solid #fdf0f4; }
         .title { color: var(--p); font-weight: 800; font-size: 16px; margin-bottom: 18px; display: flex; align-items: center; }
         .title::before { content: ''; display: inline-block; width: 5px; height: 18px; background: var(--p); margin-left: 8px; border-radius: 4px; }
         
-        input, select { width: 100%; padding: 14px; margin-bottom: 14px; border: 1.5px solid #eee; border-radius: 14px; background: #fafafa; font-size: 14px; outline: none; font-weight: 700; transition: all 0.3s; color: var(--text); user-select: auto; }
+        input, select { width: 100%; padding: 14px; margin-bottom: 14px; border: 1.5px solid #eee; border-radius: 14px; background: #fafafa; font-size: 14px; outline: none; font-weight: 700; color: var(--text); user-select: auto; }
         input:focus, select:focus { border-color: var(--p); background: #fff; box-shadow: 0 0 0 4px var(--pl); }
         
         button { width: 100%; padding: 15px; border: none; border-radius: 14px; font-weight: 800; font-size: 15px; cursor: pointer; transition: all 0.2s; position: relative; }
@@ -57,18 +55,22 @@
         .hidden { display: none !important; }
         .empty-state { text-align: center; padding: 20px; color: #aaa; font-weight: 600; font-size: 14px; background: #fafafa; border-radius: 12px; border: 1px dashed #ddd; margin-top: 10px; }
         
-        #toast { visibility: hidden; min-width: 260px; max-width: 90%; background: rgba(33, 33, 33, 0.95); backdrop-filter: blur(5px); color: #fff; text-align: center; border-radius: 50px; padding: 14px 20px; position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%) scale(0.9); z-index: 9999; font-weight: 700; font-size: 14px; opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        #toast { visibility: hidden; min-width: 260px; max-width: 90%; background: rgba(33, 33, 33, 0.95); color: #fff; text-align: center; border-radius: 50px; padding: 14px 20px; position: fixed; left: 50%; bottom: 90px; transform: translateX(-50%) scale(0.9); z-index: 9999; font-weight: 700; font-size: 14px; opacity: 0; transition: all 0.4s; }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) scale(1); }
         
         #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(5px); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--p); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ستايل الطباعة الأصلية (Native Print) */
+        /* ================= ستايل الطباعة الأصلية (Native Print) ================= */
         @media print {
             body { background: #fff !important; margin: 0; padding: 0; }
+            /* نخفي الموقع كله */
             header, .container, .nav, #toast, #loader { display: none !important; }
+            
+            /* نظهر الفاتورة بس */
             #print-area { display: block !important; position: static !important; width: 100% !important; padding: 20px !important; background: #fff; color: #000; direction: rtl; font-family: 'Tajawal', sans-serif; }
+            
             .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
             .print-table th, .print-table td { border: 1px solid #000 !important; padding: 10px; text-align: center; font-size: 14px; font-weight: 600; color: #000; }
             .print-table th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -105,12 +107,13 @@
     </table>
     
     <div id="p-total" style="margin-top: 25px; padding: 12px 20px; font-weight: 800; font-size: 18px; width: fit-content;">
-        إجمالي اليومية (الصافي): 0 ج.م
+        صافي اليوميه : 0 ج.م
     </div>
     
     <div style="margin-top: 40px; text-align: center; font-size: 14px; color: #555; position: relative; border-top: 1px dashed #000; padding-top: 15px; font-weight: 600;">
         <p>شكراً لتعاملكم معنا - إدارة محلات أيتن</p>
         <p>تم إصدار هذا الكشف آلياً</p>
+        <p> مستر حماده فهيد </p>
         <img src="icon.png" style="position: absolute; left: 10px; bottom: 0; width: 65px; height: 65px; border-radius: 50%; border: 1px solid #ddd;" onerror="this.style.display='none'">
     </div>
 </div>
@@ -438,6 +441,7 @@
         
         showLoader(true, 'تجهيز شاشة الطباعة...');
         
+        // 1. تجهيز بيانات الفاتورة المخفية
         const fullDateStr = new Date().toLocaleDateString('ar-EG', { year:'numeric', month:'2-digit', day:'2-digit' });
         document.getElementById('p-date').innerText = `التاريخ: ${fullDateStr}`;
         const pBody = document.getElementById('p-tbody'); pBody.innerHTML = '';
@@ -452,16 +456,21 @@
                 <td style="font-weight:bold;">${Math.abs(entry.amount)} ج</td>
             </tr>`;
         }
-        document.getElementById('p-total').innerText = `إجمالي اليومية (الصافي): ${document.getElementById('stat-net').innerText} ج.م`;
+        document.getElementById('p-total').innerText = `الإجمالي المطلوب سداده: ${document.getElementById('stat-net').innerText} ج.م`;
         
+        // 2. إظهار الفاتورة عشان الموبايل يشوفها
         const printArea = document.getElementById('print-area'); 
         printArea.classList.remove('hidden');
         
+        // 3. ندي المتصفح نص ثانية يرسم الألوان والجدول عشان ميطلعش شاشة بيضا
         setTimeout(() => {
             showLoader(false);
-            window.print(); 
+            window.print(); // فتح شاشة الطباعة الأصلية
+            
+            // 4. إخفاء الفاتورة تاني بعد أمر الطباعة
             printArea.classList.add('hidden');
             
+            // 5. نسأل المستخدم لو طبع عشان نصفر
             setTimeout(async () => {
                 if(confirm("✅ هل تم حفظ/طباعة الـ PDF بنجاح؟\n\n(اضغط OK لتصفير الشاشة وترحيل الوردية للأرشيف)")) {
                     showLoader(true, 'جاري تصفير الخزنة...');
@@ -471,9 +480,9 @@
                     showLoader(false); 
                     showToast("تم ترحيل الوردية للأرشيف بنجاح!");
                 }
-            }, 1000); 
+            }, 1000); // ننتظر ثانية بعد قفل شاشة الطباعة عشان نسأله
             
-        }, 500); 
+        }, 500); // 500 ملي ثانية انتظار قبل فتح شاشة الطباعة
     };
 </script>
 </body>
