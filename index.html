@@ -62,15 +62,11 @@
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid var(--p); border-radius: 50%; width: 50px; height: 50px; animation: spin 1s linear infinite; margin-bottom: 15px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ================= ستايل الطباعة الأصلية (Native Print) ================= */
+        /* ================= ستايل الطباعة الأصلية ================= */
         @media print {
             body { background: #fff !important; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            /* نخفي الموقع كله */
             header, .container, .nav, #toast, #loader { display: none !important; }
-            
-            /* نظهر الفاتورة بس */
             #print-area { display: block !important; position: relative !important; width: 100% !important; padding: 20px !important; background: #fff; color: #000; direction: rtl; font-family: 'Tajawal', sans-serif; z-index: 1; overflow: hidden; }
-            
             .print-table { width: 100%; border-collapse: collapse; margin-top: 15px; z-index: 2; position: relative; }
             .print-table th, .print-table td { border: 1px solid #000 !important; padding: 10px; text-align: center; font-size: 14px; font-weight: 600; color: #000; }
             .print-table th { background-color: #f0f0f0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
@@ -84,7 +80,6 @@
 <div id="loader" class="hidden"><div class="spinner"></div><h3 style="color:var(--p); font-weight:800;" id="loader-text">جاري المعالجة...</h3></div>
 
 <div id="print-area" class="hidden">
-    <!-- العلامة المائية الشفافة في الخلفية -->
     <img src="icon.png" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70%; max-width: 350px; opacity: 0.05; z-index: -1; pointer-events: none;" onerror="this.style.display='none'">
 
     <div style="text-align: center; margin-bottom: 20px; position: relative; z-index: 2;">
@@ -117,7 +112,6 @@
         <p>شكراً لتعاملكم معنا - إدارة محلات أيتن</p>
         <p>تم إصدار هذا الكشف آلياً</p>
         <p> مستر حماده فهيد </p>
-        <!-- اللوجو بتأثير 3D -->
         <img src="icon.png" style="position: absolute; left: 10px; bottom: 0; width: 75px; height: 75px; border-radius: 50%; border: 2px solid var(--p, #c25983); box-shadow: 4px 6px 12px rgba(0,0,0,0.25), inset 2px 2px 8px rgba(255,255,255,0.7), inset -2px -2px 6px rgba(0,0,0,0.1); transform: perspective(300px) rotateY(15deg) rotateX(5deg);" onerror="this.style.display='none'">
     </div>
 </div>
@@ -240,20 +234,67 @@
     const today = getSafeDateKey(); 
     let currentShiftData = null;
 
-    const getExactTime = () => {
-        const d = new Date();
-        let h = d.getHours(), m = d.getMinutes(), s = d.getSeconds();
-        let ampm = h >= 12 ? 'م' : 'ص';
-        h = h % 12 || 12;
-        return `${h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s} ${ampm}`;
-    };
-
     const showToast = (msg, type = 's') => {
         const toast = document.getElementById("toast");
         toast.innerText = msg;
         toast.style.background = type === 's' ? 'rgba(194, 89, 131, 0.95)' : 'rgba(231, 76, 60, 0.95)';
         toast.className = "show";
         setTimeout(() => toast.className = toast.className.replace("show", ""), 3000);
+    };
+
+    // ==========================================
+    // --- نظام الأرشفة التلقائية (الخلاصة للـ 24 ساعة) ---
+    // ==========================================
+    async function autoArchiveOldShifts() {
+        try {
+            const ledgersSnap = await get(ref(db, 'ledgers'));
+            const allLedgers = ledgersSnap.val();
+            if (!allLedgers) return; // مفيش يوميات
+
+            let archivedSomething = false;
+
+            // بنلف على كل الأيام المتسجلة في الخزنة المفتوحة
+            for (let dateKey in allLedgers) {
+                // لو لقينا يومية تاريخها أقدم من تاريخ النهارده (متقفلتش)
+                if (dateKey < today) {
+                    const shiftData = allLedgers[dateKey];
+                    const shiftId = dateKey + "_Shift_AutoClosed_12AM"; 
+                    
+                    // ننقلها للأرشيف ونمسحها من الخزنة المفتوحة
+                    await set(ref(db, `archives/${shiftId}`), shiftData);
+                    await remove(ref(db, `ledgers/${dateKey}`));
+                    
+                    archivedSomething = true;
+                }
+            }
+            
+            if (archivedSomething) {
+                setTimeout(() => showToast("تم إغلاق وترحيل يومية أمس للأرشيف تلقائياً 🕒", "s"), 1500);
+            }
+        } catch (error) {
+            console.error("خطأ في الأرشفة التلقائية:", error);
+        }
+    }
+
+    // تشغيل الأرشفة التلقائية أول ما الموقع يفتح
+    autoArchiveOldShifts();
+
+    // تشغيل عداد بيفحص الوقت كل دقيقة (عشان لو الموقع فضل مفتوح والساعة جت 12)
+    setInterval(() => {
+        const currentRealDate = getSafeDateKey();
+        if (currentRealDate !== today) {
+            // اليوم اتغير! نعمل ريفريش للموقع عشان يقفل اليومية أوتوماتيك ويفتح يوم جديد
+            window.location.reload(); 
+        }
+    }, 60000); // 60000 ملي ثانية يعني دقيقة
+    // ==========================================
+
+    const getExactTime = () => {
+        const d = new Date();
+        let h = d.getHours(), m = d.getMinutes(), s = d.getSeconds();
+        let ampm = h >= 12 ? 'م' : 'ص';
+        h = h % 12 || 12;
+        return `${h}:${m < 10 ? '0'+m : m}:${s < 10 ? '0'+s : s} ${ampm}`;
     };
 
     const showLoader = (show = true, msg = 'جاري المعالجة...') => {
@@ -439,13 +480,11 @@
         } finally { showLoader(false); }
     };
 
-    // --- دالة فتح شاشة الطباعة الأصلية بتاعة الموبايل ---
     window.triggerNativePrintAndReset = () => {
         if(!currentShiftData || Object.keys(currentShiftData).length === 0) return showToast("الوردية فارغة، لا يوجد شيء لطباعته!", "e");
         
         showLoader(true, 'تجهيز شاشة الطباعة...');
         
-        // 1. تجهيز بيانات الفاتورة المخفية
         const fullDateStr = new Date().toLocaleDateString('ar-EG', { year:'numeric', month:'2-digit', day:'2-digit' });
         document.getElementById('p-date').innerText = `التاريخ: ${fullDateStr}`;
         const pBody = document.getElementById('p-tbody'); pBody.innerHTML = '';
@@ -461,22 +500,17 @@
             </tr>`;
         }
         
-        // تعديل الجملة هنا عشان تبقى "صافي الوردية" بدل "الإجمالي المطلوب سداده"
         document.getElementById('p-total').innerText = `صافي الوردية: ${document.getElementById('stat-net').innerText} ج.م`;
         
-        // 2. إظهار الفاتورة عشان الموبايل يشوفها
         const printArea = document.getElementById('print-area'); 
         printArea.classList.remove('hidden');
         
-        // 3. ندي المتصفح نص ثانية يرسم الألوان والجدول عشان ميطلعش شاشة بيضا
         setTimeout(() => {
             showLoader(false);
-            window.print(); // فتح شاشة الطباعة الأصلية
+            window.print();
             
-            // 4. إخفاء الفاتورة تاني بعد أمر الطباعة
             printArea.classList.add('hidden');
             
-            // 5. نسأل المستخدم لو طبع عشان نصفر
             setTimeout(async () => {
                 if(confirm("✅ هل تم حفظ/طباعة الـ PDF بنجاح؟\n\n(اضغط OK لتصفير الشاشة وترحيل الوردية للأرشيف)")) {
                     showLoader(true, 'جاري تصفير الخزنة...');
@@ -486,9 +520,9 @@
                     showLoader(false); 
                     showToast("تم ترحيل الوردية للأرشيف بنجاح!");
                 }
-            }, 1000); // ننتظر ثانية بعد قفل شاشة الطباعة عشان نسأله
+            }, 1000); 
             
-        }, 500); // 500 ملي ثانية انتظار قبل فتح شاشة الطباعة
+        }, 500); 
     };
 </script>
 </body>
