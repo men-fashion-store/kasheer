@@ -458,11 +458,10 @@
     <div id="login-screen">
         <div class="login-box glass-panel">
             <img src="احمد الشيخ (3).png" alt="أحمد الشيخ">
-            <h2 style="margin-bottom:25px; color:var(--text-main); font-weight:900; text-shadow: 0 2px 5px rgba(0,0,0,0.1);">تسجيل الدخول</h2>
+            <h2 style="margin-bottom:25px; color:var(--text-main); font-weight:900;">أحمد الشيخ</h2>
             <form id="loginForm">
-                <input type="email" id="email" class="input-clean" style="margin-bottom:15px;" required placeholder="احمد الشيخ">
-                <input type="password" id="password" class="input-clean" style="margin-bottom:25px;" required placeholder="123">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> دخول للنظام</button>
+                <input type="password" id="password" class="input-clean" style="margin-bottom:25px; text-align:center; font-size:28px; letter-spacing:8px;" required placeholder="كلمة المرور" inputmode="numeric" autocomplete="off" maxlength="12">
+                <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> دخول</button>
                 <p id="login-error" style="color:var(--danger); margin-top:15px; display:none; font-weight:900; background: rgba(217,83,79,0.1); padding:10px; border-radius:10px;"></p>
             </form>
         </div>
@@ -726,6 +725,10 @@
             'شبشب رجالي', 'شبشب اولادي'
         ];
 
+        const APP_PASSWORD = '123';
+        const SHOP_FB_EMAIL = 'shop@alshaikh.app';
+        const SHOP_FB_PASS = '123';
+
         // متغيرات الحماية بالباسورد
         let pendingTabToOpen = null;
         window.currentDayIsClosed = false;
@@ -858,7 +861,7 @@
 
         document.getElementById('btn-submit-pass').addEventListener('click', () => {
             const pass = document.getElementById('section-password').value;
-            if (pass === '123') { // الباسورد المطلوب
+            if (pass === APP_PASSWORD) {
                 document.getElementById('password-modal').style.display = 'none';
                 const tab = pendingTabToOpen;
                 pendingTabToOpen = null;
@@ -1150,19 +1153,33 @@
         // ==========================================
         // مصادقة الدخول والاتصال بالمديونيات (dbDebts)
         // ==========================================
+        function showAppUI() {
+            loginScreen.style.display = 'none';
+            appContainer.style.display = 'block';
+            bottomNav.style.display = 'flex';
+            document.getElementById('dailyDateSelector').value = getLocalDateString();
+            initProductGrid();
+            initMobileUX();
+            watchCashierDayStatus();
+            executeTabSwitch('cashier');
+        }
+
+        function showLoginUI() {
+            loginScreen.style.display = 'flex';
+            appContainer.style.display = 'none';
+            bottomNav.style.display = 'none';
+        }
+
+        async function connectFirebase() {
+            await signInWithEmailAndPassword(authAyten, SHOP_FB_EMAIL, SHOP_FB_PASS);
+            try { await signInWithEmailAndPassword(authDebts, SHOP_FB_EMAIL, SHOP_FB_PASS); } catch (e) {}
+        }
+
         onAuthStateChanged(authAyten, (user) => {
             loader.style.display = 'none';
-            if (user) { 
-                loginScreen.style.display = 'none'; 
-                appContainer.style.display = 'block'; 
-                bottomNav.style.display = 'flex';
-                
-                document.getElementById('dailyDateSelector').value = getLocalDateString();
-                
-                initProductGrid();
-                initMobileUX();
-                watchCashierDayStatus();
-                executeTabSwitch('cashier'); 
+            if (sessionStorage.getItem('app_ok') === '1') {
+                showAppUI();
+                if (!user) connectFirebase().catch(() => showToast('⚠️ تحقق من الاتصال بالإنترنت'));
             } else {
                 if(unsubDaily) { unsubDaily(); unsubDaily = null; }
                 if(unsubCustomers) { unsubCustomers(); unsubCustomers = null; }
@@ -1170,36 +1187,41 @@
                 if (typeof window.closeWorkspace === 'function') window.closeWorkspace();
                 posTempCart = [];
                 renderPOSCart();
-                loginScreen.style.display = 'flex'; 
-                appContainer.style.display = 'none'; 
-                bottomNav.style.display = 'none';
+                showLoginUI();
             }
         });
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
+            const password = document.getElementById('password').value.trim();
             const loginError = document.getElementById('login-error');
             loginError.style.display = 'none';
-            try {
-                await signInWithEmailAndPassword(authAyten, email, password);
-                try {
-                    await signInWithEmailAndPassword(authDebts, email, password);
-                } catch(debtErr) {
-                    console.warn('debts auth failed:', debtErr);
-                    setTimeout(() => showToast("⚠️ تم الدخول لكن المديونيات قد لا تعمل — تحقق من حساب Firebase"), 500);
-                }
-            } catch(err) {
+
+            if (password !== APP_PASSWORD) {
                 loginError.style.display = 'block';
-                loginError.innerText = "بيانات الدخول غير صحيحة!";
+                loginError.innerText = 'كلمة المرور غير صحيحة!';
+                document.getElementById('password').value = '';
+                document.getElementById('password').focus();
+                return;
+            }
+
+            sessionStorage.setItem('app_ok', '1');
+            try {
+                await connectFirebase();
+                showAppUI();
+            } catch (err) {
+                showAppUI();
+                showToast('⚠️ تم الدخول — تحقق من اتصال الإنترنت للمزامنة');
             }
         });
 
         document.getElementById('posForm').addEventListener('submit', (e) => e.preventDefault());
         
         document.getElementById('logoutBtnPos').addEventListener('click', () => {
+            sessionStorage.removeItem('app_ok');
             signOut(authAyten); signOut(authDebts);
+            showLoginUI();
+            document.getElementById('password').value = '';
         });
 
         function renderCustomersList() {
