@@ -2,8 +2,12 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#ffffff">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
     <link rel="icon" type="image/png" href="احمد الشيخ (3).png">
     <title>أحمد الشيخ - نظام الكاشير والمديونيات</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -29,6 +33,11 @@
             --info: #007bff; 
             --warning: #f0ad4e;
             --transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --nav-h: 80px;
+            --sticky-h: 0px;
+            --safe-top: env(safe-area-inset-top, 0px);
+            --safe-bottom: env(safe-area-inset-bottom, 0px);
+            --bottom-space: calc(var(--nav-h) + var(--sticky-h) + var(--safe-bottom) + 12px);
         }
 
         body.dark-mode {
@@ -47,7 +56,7 @@
             --input-bg: rgba(25, 30, 20, 0.7);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
         html, body { 
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -56,6 +65,8 @@
             background-color: var(--bg-page);
             color: var(--text-main); 
             transition: background-color var(--transition), color var(--transition);
+            padding-top: var(--safe-top);
+            overscroll-behavior: none;
         }
 
         /* --- اللوجو في الخلفية --- */
@@ -92,11 +103,12 @@
             border-top: 1px solid rgba(0,0,0,0.1);
             border-left: 1px solid rgba(0,0,0,0.1);
             color: var(--text-main); 
-            padding: 12px 16px; 
-            font-size: 15px; 
+            padding: 14px 16px; 
+            font-size: 16px;
             width: 100%; 
             border-radius: 16px;
             box-shadow: inset 0 3px 6px rgba(0,0,0,0.04);
+            min-height: 52px;
         }
         .input-clean:focus { 
             border-color: var(--primary-zayti); 
@@ -114,11 +126,12 @@
         .btn-primary { 
             background: linear-gradient(145deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%);
             color: #fff; 
-            padding: 14px; 
-            font-size: 17px; 
+            padding: 16px; 
+            font-size: 18px; 
             font-weight: 900; 
             width: 100%; 
             border: none; 
+            min-height: 56px;
             box-shadow: 0 8px 20px rgba(62, 79, 26, 0.3), inset 0 2px 0 rgba(255,255,255,0.2), inset 0 -3px 0 rgba(0,0,0,0.3);
         }
         .btn-primary:active { 
@@ -128,30 +141,34 @@
 
         /* Navigation Menu */
         .main-nav { 
-            position: fixed; bottom: 15px; left: 15px; right: 15px; height: 75px; 
+            position: fixed; 
+            bottom: calc(8px + var(--safe-bottom)); 
+            left: 12px; right: 12px; 
+            height: var(--nav-h);
             background: var(--glass-bg); backdrop-filter: blur(25px); 
             border-top: 1.5px solid var(--glass-border-light);
             border-left: 1.5px solid var(--glass-border-light);
-            border-radius: 25px;
+            border-radius: 22px;
             display: flex; justify-content: space-around; align-items: center; 
-            z-index: 100; box-shadow: 0 10px 40px rgba(0,0,0,0.1); 
-            padding: 0 10px;
+            z-index: 100; box-shadow: 0 10px 40px rgba(0,0,0,0.12); 
+            padding: 0 6px;
         }
         .nav-btn { 
             background: none; border: none; color: var(--text-muted); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-size: 13px; gap: 6px; width: 33%; height: 100%; cursor: pointer; 
-            transition: 0.3s; font-weight: 800; 
+            font-size: 12px; gap: 4px; width: 33%; min-height: 56px; cursor: pointer; 
+            transition: 0.2s; font-weight: 800; 
+            padding: 8px 4px;
         }
-        .nav-btn i { font-size: 24px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .nav-btn i { font-size: 26px; transition: 0.2s; }
         .nav-btn.active { color: var(--primary-zayti); }
-        .nav-btn.active i { transform: translateY(-5px) scale(1.2); text-shadow: 0 10px 20px rgba(62, 79, 26, 0.4); }
+        .nav-btn.active i { transform: translateY(-3px) scale(1.1); }
 
         #login-screen { position: absolute; inset: 0; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; display: none; background: var(--bg-page); }
         .login-box { padding: 40px 30px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; z-index: 1; }
         .login-box img { width: 130px; height: 130px; border-radius: 25px; object-fit: cover; margin-bottom: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.5); background: #fff; border: 3px solid rgba(255,255,255,0.8);}
 
-        #app-container { display: none; position: relative; width: 100%; height: calc(100% - 100px); overflow: hidden; }
+        #app-container { display: none; position: relative; width: 100%; height: calc(100dvh - var(--nav-h) - var(--safe-bottom) - 16px); overflow: hidden; }
         .main-view { position: absolute; inset: 0; display: none; flex-direction: column; overflow: hidden; }
         .main-view.active { display: flex; }
 
@@ -159,28 +176,36 @@
             background: var(--glass-bg); backdrop-filter: blur(20px); 
             border-bottom: 1px solid var(--glass-border-dark); 
             border-top: 1px solid var(--glass-border-light);
-            color: var(--text-main); height: 85px; 
+            color: var(--text-main); min-height: 64px; height: auto;
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 20px; flex-shrink: 0; z-index: 10; 
+            padding: 10px 16px; flex-shrink: 0; z-index: 10; 
             box-shadow: 0 4px 30px rgba(0,0,0,0.05); 
-            margin-bottom: 5px;
-            border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;
+            margin-bottom: 4px;
+            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
         }
-        .header-title { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 900; text-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .header-title img { width: 48px; height: 48px; object-fit: cover; background: rgba(255,255,255,0.9); border-radius: 14px; padding: 2px; box-shadow: 0 5px 15px rgba(0,0,0,0.1), inset 0 2px 0 rgba(255,255,255,0.8); }
+        .header-title { display: flex; align-items: center; gap: 10px; font-size: 17px; font-weight: 900; }
+        .header-title img { width: 42px; height: 42px; object-fit: cover; background: rgba(255,255,255,0.9); border-radius: 12px; padding: 2px; }
+        .header-title .title-full { display: none; }
+        .header-title .title-short { display: inline; }
         
         .header-btns { display: flex; gap: 10px; }
         .btn-icon-top { 
             background: var(--input-bg); 
             border: 1px solid var(--glass-border-light); 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05), inset 0 2px 0 rgba(255,255,255,0.8);
-            color: var(--text-main); width: 45px; height: 45px; border-radius: 14px; 
+            color: var(--text-main); width: 48px; height: 48px; border-radius: 14px; 
             display: flex; justify-content: center; align-items: center; font-size: 18px; 
-            cursor: pointer; transition: 0.2s; 
+            cursor: pointer; transition: 0.15s; 
         }
         .btn-icon-top:active { transform: translateY(2px) scale(0.95); box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); background: var(--primary-zayti); color: #fff; }
 
-        .scroll-wrapper { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; z-index: 2; padding-bottom: 20px; }
+        .scroll-wrapper { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; z-index: 2; padding-bottom: var(--bottom-space); overscroll-behavior: contain; scroll-behavior: smooth; }
+        
+        #view-cashier.has-cart { --sticky-h: 76px; }
+
+        #screen-workspace .scroll-wrapper { padding-bottom: 12px; }
+        #screen-workspace .glass-panel:last-child { margin-bottom: 8px; flex-shrink: 0; }
+
+        .btn-primary:disabled { opacity: 0.65; pointer-events: none; }
         
         /* Shared lists and forms */
         .top-bar-actions { padding: 15px 20px 10px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
@@ -189,7 +214,7 @@
         .search-wrapper input { padding-right: 50px; border-radius: 20px; z-index: 4; font-weight: bold; }
 
         /* Cashier specific */
-        .cart-container { padding: 15px; flex: 1; overflow-y: auto; }
+        .cart-container { padding: 12px 16px; }
         .cart-item { 
             display: flex; justify-content: space-between; align-items: center; 
             padding: 15px; border-radius: 18px; margin-bottom: 12px; 
@@ -198,6 +223,71 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.03), inset 0 2px 0 var(--glass-border-light);
         }
         .cart-item.return-item { border-right-color: var(--danger); }
+
+        .cashier-day-status {
+            text-align: center; font-size: 14px; font-weight: 900;
+            margin: 12px 20px 0; padding: 12px; border-radius: 15px;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .product-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
+            margin-bottom: 12px;
+        }
+        .product-btn {
+            background: var(--input-bg); border: 2px solid var(--glass-border-dark);
+            color: var(--text-main); padding: 14px 10px; border-radius: 14px;
+            font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.15s;
+            min-height: 54px;
+            display: flex; align-items: center; justify-content: center; text-align: center;
+        }
+        .product-btn:active { transform: scale(0.96); background: rgba(62,79,26,0.08); }
+        .product-btn.selected {
+            background: var(--primary-zayti); color: #fff;
+            border-color: var(--primary-zayti);
+            box-shadow: 0 5px 15px rgba(62,79,26,0.3);
+        }
+        .product-btn.other-btn { border-style: dashed; }
+        .product-btn.other-btn.selected { border-style: solid; }
+        #posCustomRow { display: none; margin-bottom: 10px; }
+        #posCustomRow.show { display: block; }
+        .selected-product-label {
+            font-size: 14px; font-weight: 800; color: var(--primary-zayti);
+            margin-bottom: 8px; min-height: 22px;
+        }
+
+        .qty-stepper {
+            display: flex; align-items: stretch; gap: 8px; flex: 1;
+        }
+        .qty-stepper input { text-align: center; font-weight: 900; font-size: 18px; flex: 1; min-width: 0; }
+        .stepper-btn {
+            width: 52px; min-height: 52px; border: none; border-radius: 14px;
+            background: var(--primary-zayti); color: #fff; font-size: 24px; font-weight: 900;
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .stepper-btn:active { transform: scale(0.94); opacity: 0.9; }
+
+        .cashier-sticky-bar {
+            display: none;
+            position: fixed;
+            left: 0; right: 0;
+            bottom: calc(var(--nav-h) + var(--safe-bottom) + 8px);
+            z-index: 99;
+            padding: 10px 14px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--glass-border-light);
+            box-shadow: 0 -8px 30px rgba(0,0,0,0.1);
+            gap: 12px;
+            align-items: center;
+        }
+        #view-cashier.has-cart .cashier-sticky-bar { display: flex; }
+        .sticky-total {
+            flex: 1; font-weight: 900; font-size: 16px; line-height: 1.3;
+        }
+        .sticky-total span { display: block; font-size: 22px; color: var(--primary-zayti); direction: ltr; text-align: right; }
+        .cashier-sticky-bar .btn-primary { width: auto; min-width: 130px; padding: 14px 18px; font-size: 16px; flex-shrink: 0; }
         
         .daily-totals { 
             display: flex; justify-content: space-between; 
@@ -231,6 +321,14 @@
         .cust-info .phone, .cust-info .date { font-size: 14px; color: var(--text-muted); margin-bottom: 4px; display: block; font-weight: 700; }
         .cust-amount { font-size: 20px; font-weight: 900; direction: ltr; color: var(--primary-zayti); text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
+        .debts-grand-total {
+            display: flex; justify-content: space-between; align-items: center;
+            background: linear-gradient(135deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%);
+            color: white; padding: 18px 20px; border-radius: 20px;
+            margin: 0 20px 10px; font-weight: 900; font-size: 18px;
+            box-shadow: 0 10px 25px rgba(62,79,26,0.3);
+        }
+
         /* Workspace */
         #screen-workspace { 
             position: absolute; inset: 0; transform: translateX(-100%); z-index: 200; 
@@ -247,7 +345,8 @@
         .form-row { display: flex; gap: 10px; align-items: center; }
         .btn-action { 
             width: 100%; border-radius: 16px; color: white; border: none; 
-            font-size: 17px; padding: 14px; font-weight: 900; margin-top: 5px; 
+            font-size: 16px; padding: 16px; font-weight: 900; margin-top: 5px; 
+            min-height: 56px;
             box-shadow: 0 8px 20px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.2), inset 0 -3px 0 rgba(0,0,0,0.2);
         }
         .btn-action:active { transform: translateY(3px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -277,7 +376,7 @@
         .item-price { font-size: 19px; font-weight: 900; direction: ltr; text-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .is-return .item-price { color: var(--warning); }
         
-        .btn-delete { background: rgba(217,83,79,0.1); border: 1px solid rgba(217,83,79,0.2); color: var(--danger); font-size: 16px; padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight:bold; }
+        .btn-delete { background: rgba(217,83,79,0.1); border: 1px solid rgba(217,83,79,0.2); color: var(--danger); font-size: 16px; padding: 10px 14px; border-radius: 12px; cursor: pointer; transition: 0.15s; font-weight:bold; min-width: 44px; min-height: 44px; }
         .btn-delete:active { background: var(--danger); color: white; }
 
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); opacity: 0.7; font-weight: 800; font-size: 18px; }
@@ -285,8 +384,24 @@
 
         #loader { position: fixed; inset: 0; background: var(--bg-page); z-index: 9999; display: flex; flex-direction:column; justify-content: center; align-items: center; font-size: 24px; color: var(--primary-zayti); font-weight: 900; text-shadow: 0 4px 10px rgba(0,0,0,0.1); }
         
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--text-main); color: var(--bg-page); padding: 16px 32px; border-radius: 30px; font-weight: 900; font-size: 16px; opacity: 0; pointer-events: none; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10000; box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.2); }
-        #toast.show { opacity: 1; top: 50px; }
+        #toast { position: fixed; top: calc(12px + var(--safe-top)); left: 50%; transform: translateX(-50%); background: var(--text-main); color: var(--bg-page); padding: 14px 24px; border-radius: 30px; font-weight: 900; font-size: 15px; opacity: 0; pointer-events: none; transition: 0.3s ease; z-index: 10000; max-width: 92vw; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.3); }
+        #toast.show { opacity: 1; top: calc(24px + var(--safe-top)); }
+
+        @media (min-width: 768px) {
+            .header-title .title-full { display: inline; }
+            .header-title .title-short { display: none; }
+            header { min-height: 80px; padding: 0 20px; }
+            .header-title { font-size: 20px; }
+        }
+
+        @media (max-width: 767px) {
+            .glass-panel { backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+            .app-watermark { opacity: 0.03; transform: translate(-50%, -50%) scale(1); }
+            .workspace-forms { padding: 14px; }
+            .top-bar-actions { padding: 12px 16px 8px; }
+            .daily-totals, .debts-grand-total { margin-inline: 16px; font-size: 17px; padding: 16px; }
+            .customer-card, .item-card { margin-inline: 16px; padding: 16px; }
+        }
 
         /* --- نافذة كلمة المرور الزجاجية --- */
         #password-modal {
@@ -360,7 +475,8 @@
             <header>
                 <div class="header-title">
                     <img src="احمد الشيخ (3).png" alt="Logo">
-                    <span>الكاشير (بيع مباشر)</span>
+                    <span class="title-short">الكاشير</span>
+                    <span class="title-full">الكاشير (بيع مباشر)</span>
                 </div>
                 <div class="header-btns">
                     <button class="btn-icon-top" onclick="toggleTheme()" title="تغيير المظهر"><i class="fas fa-moon"></i></button>
@@ -369,28 +485,43 @@
             </header>
             
             <div class="scroll-wrapper">
-                <div class="workspace-forms glass-panel" style="margin: 20px; border-radius: 20px;">
+                <div id="cashierDayStatus" class="cashier-day-status glass-panel status-open">
+                    <i class="fas fa-lock-open"></i> جاري التحقق من حالة اليومية...
+                </div>
+
+                <div class="workspace-forms glass-panel" style="margin: 12px 16px; border-radius: 18px;">
                     <form id="posForm">
-                        <div class="form-row">
-                            <input type="text" id="posItemName" class="input-clean" placeholder="الصنف (مثال: كوتشي أبيض)" required style="flex:2;">
+                        <p style="font-weight:900; margin-bottom:10px; font-size:14px;"><i class="fas fa-shoe-prints"></i> اختر الصنف:</p>
+                        <div class="product-grid" id="productGrid"></div>
+                        <div id="posCustomRow">
+                            <input type="text" id="posCustomName" class="input-clean" placeholder="اكتب الصنف يدوياً (شئ آخر)..." enterkeyhint="next" autocomplete="off">
                         </div>
-                        <div class="form-row" style="margin-top: 12px;">
-                            <input type="number" id="posItemQty" class="input-clean" placeholder="العدد" min="1" value="1" required style="flex:1;">
-                            <input type="number" id="posItemPrice" class="input-clean" placeholder="السعر" min="0" required style="flex:1;">
+                        <div id="selectedProductLabel" class="selected-product-label"></div>
+                        <div class="form-row" style="margin-top: 4px;">
+                            <div class="qty-stepper">
+                                <button type="button" class="stepper-btn" onclick="adjustQty(-1)" aria-label="نقص العدد">−</button>
+                                <input type="number" id="posItemQty" class="input-clean" placeholder="العدد" min="1" value="1" required inputmode="numeric" enterkeyhint="next">
+                                <button type="button" class="stepper-btn" onclick="adjustQty(1)" aria-label="زود العدد">+</button>
+                            </div>
+                            <input type="number" id="posItemPrice" class="input-clean" placeholder="السعر" min="0" step="any" required style="flex:1;" inputmode="decimal" enterkeyhint="done">
                         </div>
-                        <div class="form-row" style="margin-top: 15px; gap: 12px;">
-                            <button type="button" class="btn btn-action btn-add-debt" onclick="addToPOS('sale')"><i class="fas fa-cart-plus"></i> بيع مباشر</button>
+                        <div class="form-row" style="margin-top: 12px; gap: 10px;">
+                            <button type="button" class="btn btn-action btn-add-debt" onclick="addToPOS('sale')"><i class="fas fa-cart-plus"></i> بيع</button>
                             <button type="button" class="btn btn-action btn-add-return" onclick="addToPOS('return')"><i class="fas fa-undo"></i> مرتجع</button>
                         </div>
                     </form>
                 </div>
                 
-                <h3 style="margin: 0 20px; font-weight: 900; text-shadow: 0 2px 4px rgba(0,0,0,0.05);"><i class="fas fa-shopping-basket" style="color:var(--primary-zayti);"></i> سلة المعاملات الحالية:</h3>
+                <h3 style="margin: 0 16px; font-weight: 900; font-size: 15px;"><i class="fas fa-shopping-basket" style="color:var(--primary-zayti);"></i> السلة:</h3>
                 <div id="posCart" class="cart-container"></div>
-                
-                <div style="padding: 15px 20px;">
-                    <button id="btnCompleteTransaction" class="btn btn-primary" onclick="completeTransaction()" style="display: none;"><i class="fas fa-check-circle"></i> إنهاء وترحيل لليومية</button>
+            </div>
+
+            <div class="cashier-sticky-bar glass-panel">
+                <div class="sticky-total">
+                    صافي السلة
+                    <span id="stickyCartTotal">0 ج.م</span>
                 </div>
+                <button id="btnCompleteTransaction" class="btn btn-primary" onclick="completeTransaction()"><i class="fas fa-check-circle"></i> إنهاء</button>
             </div>
         </div>
 
@@ -399,7 +530,8 @@
             <header>
                 <div class="header-title">
                     <img src="احمد الشيخ (3).png" alt="Logo">
-                    <span>يومية المبيعات</span>
+                    <span class="title-short">اليومية</span>
+                    <span class="title-full">يومية المبيعات</span>
                 </div>
             </header>
             <div class="scroll-wrapper">
@@ -431,7 +563,8 @@
             <header>
                 <div class="header-title">
                     <img src="احمد الشيخ (3).png" alt="Logo">
-                    <span>سجل المديونيات</span>
+                    <span class="title-short">المديونيات</span>
+                    <span class="title-full">سجل المديونيات</span>
                 </div>
             </header>
 
@@ -439,15 +572,19 @@
                 <div class="top-bar-actions">
                     <div class="search-wrapper" style="margin-bottom:5px;">
                         <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" class="input-clean" onkeyup="filterCustomers()" placeholder="ابحث عن اسم العميل...">
+                        <input type="text" id="searchInput" class="input-clean" onkeyup="filterCustomers()" placeholder="ابحث عن اسم العميل..." enterkeyhint="search" autocomplete="off">
                     </div>
                     <form id="addCustomerForm" class="add-customer-form glass-panel" style="padding:15px; border-radius:20px; margin-top:5px;">
                         <input type="text" id="newCustomerName" class="input-clean" placeholder="اسم العميل الجديد..." required>
                         <div class="add-customer-row">
-                            <input type="tel" id="newCustomerPhone" class="input-clean" placeholder="رقم الموبايل (اختياري)">
+                            <input type="tel" id="newCustomerPhone" class="input-clean" placeholder="رقم الموبايل (اختياري)" inputmode="tel" autocomplete="tel">
                             <button type="submit" class="btn" title="حفظ العميل"><i class="fas fa-user-plus"></i></button>
                         </div>
                     </form>
+                </div>
+                <div id="debtsGrandTotal" class="debts-grand-total glass-panel" style="display:none;">
+                    <span><i class="fas fa-coins"></i> إجمالي كل المديونيات:</span>
+                    <span id="debtsGrandTotalAmount">0 ج.م</span>
                 </div>
                 <div class="list-container" id="customersList"></div>
             </div>
@@ -457,7 +594,7 @@
         <div id="screen-workspace">
             <header>
                 <div class="header-title">
-                    <button onclick="closeWorkspace()" style="background:var(--input-bg); border:1px solid var(--glass-border-light); color:var(--text-main); font-size:20px; margin-left:12px; cursor:pointer; width:40px; height:40px; border-radius:12px; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 10px rgba(0,0,0,0.05);"><i class="fas fa-arrow-right"></i></button>
+                    <button type="button" onclick="closeWorkspace()" class="btn-icon-top" style="margin-left:8px;" aria-label="رجوع"><i class="fas fa-arrow-right"></i></button>
                     <div id="currentCustomerName" style="display:flex; flex-direction:column; line-height: 1.2;">
                         <span style="font-size: 19px;"><i class="fas fa-user-circle"></i> اسم العميل</span>
                     </div>
@@ -508,7 +645,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, onSnapshot, updateDoc, deleteDoc, serverTimestamp, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, onSnapshot, updateDoc, deleteDoc, serverTimestamp, setDoc, arrayUnion, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         // ==========================================
         // 1. إعدادات قاعدة بيانات (آيتن) - للكاشير واليوميات
@@ -550,11 +687,46 @@
         let currentCustomerId = null;
         let customersData = []; 
         let posTempCart = [];
-        let unsubDaily = null; // لمراقبة اليومية المفتوحة
+        let unsubDaily = null;
+        let unsubCustomers = null;
+        let unsubCashierDay = null;
+        let selectedProduct = '';
+        let isOtherProduct = false;
+        let isCompleting = false;
+
+        function tapFeedback() {
+            if (navigator.vibrate) navigator.vibrate(10);
+        }
+
+        window.adjustQty = function(delta) {
+            const qtyEl = document.getElementById('posItemQty');
+            const next = Math.max(1, (parseInt(qtyEl.value, 10) || 1) + delta);
+            qtyEl.value = next;
+            tapFeedback();
+        }
+
+        function initMobileUX() {
+            document.querySelectorAll('.input-clean').forEach(el => {
+                el.addEventListener('focus', () => {
+                    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 280);
+                }, { passive: true });
+            });
+
+            document.getElementById('posItemPrice').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); addToPOS('sale'); }
+            });
+            document.getElementById('posCustomName')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') { e.preventDefault(); document.getElementById('posItemPrice').focus(); }
+            });
+        }
+
+        const PRODUCT_CATEGORIES = [
+            'كوتشي رجالي', 'كوتشي حريمي', 'كوتشي اطفالي',
+            'صندل رجالي', 'صندل اولادي', 'صندل بناتي',
+            'شبشب رجالي', 'شبشب اولادي'
+        ];
 
         // متغيرات الحماية بالباسورد
-        let unlockedDaily = false;
-        let unlockedDebts = false;
         let pendingTabToOpen = null;
         window.currentDayIsClosed = false;
         window.dailyTransactionsForPrint = [];
@@ -576,6 +748,78 @@
             }
         }
 
+        function escapeHtml(str) {
+            return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        function getFullDateTime(dateObj = new Date()) {
+            return dateObj.toLocaleString('ar-EG', {
+                year: 'numeric', month: 'long', day: 'numeric',
+                weekday: 'long', hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+
+        function formatTransDateTime(trans) {
+            if (trans.datetime) return trans.datetime;
+            if (trans.date && trans.time) return `${trans.date} — ${trans.time}`;
+            return trans.time || '—';
+        }
+
+        function initProductGrid() {
+            const grid = document.getElementById('productGrid');
+            grid.innerHTML = PRODUCT_CATEGORIES.map(name =>
+                `<button type="button" class="product-btn" data-product="${name}" onclick="selectProduct('${name}')">${name}</button>`
+            ).join('') + `<button type="button" class="product-btn other-btn" onclick="selectOtherProduct()"><i class="fas fa-pen"></i> شئ آخر</button>`;
+        }
+
+        window.selectProduct = function(name) {
+            selectedProduct = name;
+            isOtherProduct = false;
+            document.getElementById('posCustomRow').classList.remove('show');
+            document.getElementById('posCustomName').value = '';
+            document.querySelectorAll('.product-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelector(`[data-product="${name}"]`)?.classList.add('selected');
+            document.getElementById('selectedProductLabel').innerHTML = `<i class="fas fa-check-circle"></i> المختار: <strong>${name}</strong>`;
+            document.getElementById('posItemPrice').focus();
+        }
+
+        window.selectOtherProduct = function() {
+            selectedProduct = '';
+            isOtherProduct = true;
+            document.querySelectorAll('.product-btn').forEach(b => b.classList.remove('selected'));
+            document.querySelector('.other-btn')?.classList.add('selected');
+            document.getElementById('posCustomRow').classList.add('show');
+            document.getElementById('selectedProductLabel').innerHTML = '<i class="fas fa-pen"></i> اكتب الصنف يدوياً';
+            document.getElementById('posCustomName').focus();
+        }
+
+        function getPosItemName() {
+            if (isOtherProduct) return document.getElementById('posCustomName').value.trim();
+            return selectedProduct;
+        }
+
+        function updateCashierDayStatus(isClosed) {
+            const el = document.getElementById('cashierDayStatus');
+            if (!el) return;
+            if (isClosed) {
+                el.className = 'cashier-day-status glass-panel status-closed';
+                el.innerHTML = '<i class="fas fa-lock"></i> اليومية <strong>مقفلة</strong> — لا يمكن البيع أو الترحيل';
+            } else {
+                el.className = 'cashier-day-status glass-panel status-open';
+                el.innerHTML = '<i class="fas fa-lock-open"></i> اليومية <strong>مفتوحة</strong> — جاهز للبيع';
+            }
+        }
+
+        function watchCashierDayStatus() {
+            if (unsubCashierDay) unsubCashierDay();
+            const today = getLocalDateString();
+            unsubCashierDay = onSnapshot(doc(dbAyten, "daily_sales", today), (docSnap) => {
+                const isClosed = docSnap.exists() && docSnap.data().isClosed === true;
+                window.currentDayIsClosed = isClosed;
+                updateCashierDayStatus(isClosed);
+            });
+        }
+
         function getLocalDateString(dateObj = new Date()) {
             const y = dateObj.getFullYear();
             const m = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -583,13 +827,15 @@
             return `${y}-${m}-${d}`;
         }
 
-        // --- نظام الحماية للتنقل بين الأقسام ---
+        // --- نظام الحماية للتنقل بين الأقسام (الباسورد مطلوب في كل مرة) ---
         window.switchTab = function(tabName) {
-            if (tabName === 'daily' && !unlockedDaily) {
-                showPasswordPrompt('daily'); return;
-            }
-            if (tabName === 'debts' && !unlockedDebts) {
-                showPasswordPrompt('debts'); return;
+            const activeNav = document.querySelector('.nav-btn.active');
+            const currentTab = activeNav ? activeNav.id.replace('nav-', '') : null;
+            if (currentTab === tabName) return;
+
+            if (tabName === 'daily' || tabName === 'debts') {
+                showPasswordPrompt(tabName);
+                return;
             }
             executeTabSwitch(tabName);
         }
@@ -614,9 +860,9 @@
             const pass = document.getElementById('section-password').value;
             if (pass === '123') { // الباسورد المطلوب
                 document.getElementById('password-modal').style.display = 'none';
-                if (pendingTabToOpen === 'daily') unlockedDaily = true;
-                if (pendingTabToOpen === 'debts') unlockedDebts = true;
-                executeTabSwitch(pendingTabToOpen);
+                const tab = pendingTabToOpen;
+                pendingTabToOpen = null;
+                executeTabSwitch(tab);
                 showToast("<i class='fas fa-unlock'></i> تم فتح القسم");
             } else {
                 showToast("❌ كلمة المرور غير صحيحة!");
@@ -624,14 +870,21 @@
         });
 
         function executeTabSwitch(tabName) {
+            if (typeof window.closeWorkspace === 'function') window.closeWorkspace();
             document.querySelectorAll('.main-view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`view-${tabName}`).classList.add('active');
             document.getElementById(`nav-${tabName}`).classList.add('active');
             
+            if(tabName === 'cashier') {
+                watchCashierDayStatus();
+            }
             if(tabName === 'daily') {
                 document.getElementById('dailyDateSelector').value = getLocalDateString();
                 loadDailyReport();
+            }
+            if(tabName === 'debts') {
+                loadCustomers();
             }
         }
 
@@ -639,19 +892,26 @@
         // الكاشير واليومية (متصل بقاعدة آيتن dbAyten)
         // ==========================================
         window.addToPOS = function(type) {
-            const nameEl = document.getElementById('posItemName');
+            if(window.currentDayIsClosed) {
+                showToast("❌ اليومية مقفلة — لا يمكن إضافة معاملات"); return;
+            }
             const qtyEl = document.getElementById('posItemQty');
             const priceEl = document.getElementById('posItemPrice');
-            const name = nameEl.value.trim();
+            const name = getPosItemName();
             const qty = parseInt(qtyEl.value);
             const price = parseFloat(priceEl.value);
 
-            if(!name || isNaN(qty) || isNaN(price)) { showToast("يرجى ملء كافة البيانات"); return; }
+            if(!name) { showToast("يرجى اختيار الصنف أو كتابته"); return; }
+            if(isNaN(qty) || qty < 1) { showToast("يرجى إدخال عدد صحيح"); return; }
+            if(isNaN(price) || price < 0) { showToast("يرجى إدخال سعر صحيح"); return; }
 
             posTempCart.push({ name, qty, price, type, id: Date.now() });
+            tapFeedback();
             renderPOSCart();
-            nameEl.value = ''; qtyEl.value = '1'; priceEl.value = '';
-            nameEl.focus();
+            if (isOtherProduct) document.getElementById('posCustomName').value = '';
+            qtyEl.value = '1'; priceEl.value = '';
+            if (isOtherProduct) document.getElementById('posCustomName').focus();
+            else document.getElementById('posItemPrice').focus();
         }
 
         window.removeFromPOS = function(id) {
@@ -661,14 +921,22 @@
 
         function renderPOSCart() {
             const container = document.getElementById('posCart');
+            const cashierView = document.getElementById('view-cashier');
+            const stickyTotal = document.getElementById('stickyCartTotal');
+            const completeBtn = document.getElementById('btnCompleteTransaction');
             container.innerHTML = '';
             let total = 0;
 
             if(posTempCart.length === 0) {
-                container.innerHTML = `<div class="empty-state"><i class="fas fa-shopping-cart"></i><p>سلة الكاشير فارغة</p></div>`;
-                document.getElementById('btnCompleteTransaction').style.display = 'none';
+                cashierView.classList.remove('has-cart');
+                stickyTotal.innerText = '0 ج.م';
+                completeBtn.disabled = false;
+                completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> إنهاء';
+                container.innerHTML = `<div class="empty-state" style="padding:30px 20px;"><i class="fas fa-shopping-cart"></i><p>السلة فارغة</p></div>`;
                 return;
             }
+
+            cashierView.classList.add('has-cart');
 
             posTempCart.forEach(item => {
                 const sub = item.qty * item.price;
@@ -677,46 +945,58 @@
                 
                 container.innerHTML += `
                     <div class="cart-item ${isReturn ? 'return-item' : ''}">
-                        <div>
-                            <strong style="font-size:16px;">${isReturn ? '🔄 مرتجع: ' : '🛍️ '}${item.name}</strong><br>
+                        <div style="flex:1; min-width:0;">
+                            <strong style="font-size:16px; display:block;">${isReturn ? '🔄 مرتجع: ' : '🛍️ '}${escapeHtml(item.name)}</strong>
                             <small class="item-meta">العدد: ${item.qty} | السعر: ${item.price} ج</small>
                         </div>
-                        <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
                             <strong style="font-size:18px; color: ${isReturn ? 'var(--danger)' : 'var(--primary-zayti)'}">${isReturn ? '-' : ''}${sub} ج</strong>
-                            <button onclick="removeFromPOS(${item.id})" class="btn-delete"><i class="fas fa-times"></i></button>
+                            <button onclick="removeFromPOS(${item.id})" class="btn-delete" aria-label="حذف"><i class="fas fa-times"></i></button>
                         </div>
                     </div>
                 `;
             });
-            document.getElementById('btnCompleteTransaction').style.display = 'block';
-            document.getElementById('btnCompleteTransaction').innerHTML = `<i class="fas fa-check-circle"></i> إنهاء (الصافي: ${total} ج.م)`;
+            stickyTotal.innerText = total + ' ج.م';
+            completeBtn.innerHTML = '<i class="fas fa-check-circle"></i> إنهاء';
+            completeBtn.disabled = false;
         }
 
         window.completeTransaction = async function() {
-            if(posTempCart.length === 0) return;
+            if(posTempCart.length === 0 || isCompleting) return;
             if(window.currentDayIsClosed) {
                 showToast("❌ لا يمكن البيع. يومية اليوم مقفلة!"); return;
             }
 
-            const today = getLocalDateString();
+            const completeBtn = document.getElementById('btnCompleteTransaction');
+            isCompleting = true;
+            completeBtn.disabled = true;
+
+            const now = new Date();
+            const today = getLocalDateString(now);
             const transaction = {
-                id: Date.now(),
-                time: new Date().toLocaleTimeString('ar-EG'),
-                items: posTempCart,
+                id: now.getTime(),
+                date: today,
+                time: now.toLocaleTimeString('ar-EG'),
+                datetime: getFullDateTime(now),
+                items: [...posTempCart],
                 net: posTempCart.reduce((acc, curr) => acc + (curr.type==='return' ? -(curr.qty*curr.price) : (curr.qty*curr.price)), 0)
             };
 
             const dayRef = doc(dbAyten, "daily_sales", today);
             
             try {
-                document.getElementById('btnCompleteTransaction').innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الترحيل...';
+                completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                 await setDoc(dayRef, { transactions: arrayUnion(transaction) }, { merge: true });
                 posTempCart = [];
+                tapFeedback();
+                if (navigator.vibrate) navigator.vibrate([10, 40, 10]);
                 renderPOSCart();
                 showToast("✅ تم الترحيل لليومية بنجاح");
             } catch(e) {
                 showToast("❌ حدث خطأ في الاتصال بالانترنت");
-                document.getElementById('btnCompleteTransaction').innerHTML = `<i class="fas fa-check-circle"></i> حاول مرة أخرى`;
+                renderPOSCart();
+            } finally {
+                isCompleting = false;
             }
         }
 
@@ -740,6 +1020,7 @@
                     const isClosed = data.isClosed || false;
 
                     if(date === getLocalDateString()) window.currentDayIsClosed = isClosed;
+                    updateCashierDayStatus(isClosed);
 
                     if(isClosed) {
                         statusIndicator.className = 'daily-status status-closed glass-panel';
@@ -756,18 +1037,28 @@
                     } else {
                         transactions.forEach((trans) => {
                             grandTotal += trans.net;
+                            const dateTimeStr = formatTransDateTime(trans);
                             let itemsHtml = trans.items.map(i => {
                                 return `<div style="display:flex; justify-content:space-between; font-size:14px; font-weight:bold; border-bottom:1px dashed rgba(0,0,0,0.1); padding:6px 0;">
-                                    <span>${i.type === 'return' ? '🔄' : '-'} ${i.name} (×${i.qty})</span>
+                                    <span>${i.type === 'return' ? '🔄' : '-'} ${escapeHtml(i.name)} (×${i.qty})</span>
                                     <span style="color:${i.type==='return'?'var(--danger)':'var(--text-main)'}">${i.type === 'return' ? '-' : ''}${i.qty * i.price} ج</span>
                                 </div>`;
                             }).join('');
 
+                            const deleteBtn = (!isClosed && date === getLocalDateString())
+                                ? `<button onclick="deleteDailyTransaction(${trans.id})" class="btn-delete" title="حذف الفاتورة"><i class="fas fa-trash-alt"></i></button>`
+                                : '';
+
                             list.innerHTML += `
                                 <div class="item-card glass-panel" style="flex-direction:column; align-items:stretch; margin-inline: 20px; padding:15px; border-radius:18px;">
-                                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom: 2px solid var(--glass-border-dark); padding-bottom:8px;">
-                                        <strong style="font-size:16px;"><i class="far fa-clock"></i> ${trans.time}</strong>
-                                        <strong style="color:var(--primary-zayti); font-size:18px; text-shadow:0 1px 2px rgba(0,0,0,0.05);">صافي: ${trans.net} ج</strong>
+                                    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; border-bottom: 2px solid var(--glass-border-dark); padding-bottom:8px; gap:10px;">
+                                        <div>
+                                            <strong style="font-size:15px; display:block;"><i class="far fa-calendar-alt"></i> ${dateTimeStr}</strong>
+                                        </div>
+                                        <div style="display:flex; align-items:center; gap:10px;">
+                                            <strong style="color:var(--primary-zayti); font-size:18px;">صافي: ${trans.net} ج</strong>
+                                            ${deleteBtn}
+                                        </div>
                                     </div>
                                     ${itemsHtml}
                                 </div>
@@ -776,7 +1067,10 @@
                     }
                     window.dailyTransactionsForPrint = transactions;
                 } else {
-                    if(date === getLocalDateString()) window.currentDayIsClosed = false;
+                    if(date === getLocalDateString()) {
+                        window.currentDayIsClosed = false;
+                        updateCashierDayStatus(false);
+                    }
                     statusIndicator.className = 'daily-status status-open glass-panel';
                     statusIndicator.innerHTML = '<i class="fas fa-lock-open"></i> اليومية مفتوحة';
                     closeBtn.style.display = date === getLocalDateString() ? 'block' : 'none';
@@ -785,6 +1079,25 @@
                 }
                 document.getElementById('dailyNetTotal').innerText = grandTotal + " ج.م";
             });
+        }
+
+        window.deleteDailyTransaction = async function(transId) {
+            const date = document.getElementById('dailyDateSelector').value;
+            if (date !== getLocalDateString() || window.currentDayIsClosed) {
+                showToast("❌ لا يمكن الحذف — اليومية مقفلة أو تاريخ قديم");
+                return;
+            }
+            if (!confirm('حذف هذه الفاتورة من اليومية؟')) return;
+            try {
+                const dayRef = doc(dbAyten, "daily_sales", date);
+                const snap = await getDoc(dayRef);
+                if (!snap.exists()) return;
+                const transactions = (snap.data().transactions || []).filter(t => t.id !== transId);
+                await setDoc(dayRef, { transactions }, { merge: true });
+                showToast("✅ تم حذف الفاتورة");
+            } catch (e) {
+                showToast("❌ فشل الحذف — تحقق من الاتصال");
+            }
         }
 
         window.closeCurrentDay = async function() {
@@ -811,7 +1124,7 @@
                     </div>
                 </div>
                 <table class="print-table">
-                    <tr><th>الوقت</th><th>البيان</th><th>صافي العملية</th></tr>
+                    <tr><th>التاريخ والوقت</th><th>البيان</th><th>صافي العملية</th></tr>
             `;
 
             if(transactions.length === 0) {
@@ -819,8 +1132,8 @@
             } else {
                 transactions.forEach(t => {
                     total += t.net;
-                    let desc = t.items.map(i => `${i.type === 'return' ? '(مرتجع)' : ''} ${i.name} (عدد ${i.qty})`).join('<br>');
-                    html += `<tr><td style="direction:ltr;">${t.time}</td><td>${desc}</td><td style="font-weight:bold; direction:ltr;">${t.net} ج</td></tr>`;
+                    let desc = t.items.map(i => `${i.type === 'return' ? '(مرتجع)' : ''} ${escapeHtml(i.name)} (عدد ${i.qty})`).join('<br>');
+                    html += `<tr><td style="direction:ltr;">${formatTransDateTime(t)}</td><td>${desc}</td><td style="font-weight:bold; direction:ltr;">${t.net} ج</td></tr>`;
                 });
             }
 
@@ -844,13 +1157,19 @@
                 appContainer.style.display = 'block'; 
                 bottomNav.style.display = 'flex';
                 
-                loadCustomers(); // جلب الداتا من dbDebts
                 document.getElementById('dailyDateSelector').value = getLocalDateString();
                 
-                unlockedDaily = false;
-                unlockedDebts = false;
+                initProductGrid();
+                initMobileUX();
+                watchCashierDayStatus();
                 executeTabSwitch('cashier'); 
-            } else { 
+            } else {
+                if(unsubDaily) { unsubDaily(); unsubDaily = null; }
+                if(unsubCustomers) { unsubCustomers(); unsubCustomers = null; }
+                if(unsubCashierDay) { unsubCashierDay(); unsubCashierDay = null; }
+                if (typeof window.closeWorkspace === 'function') window.closeWorkspace();
+                posTempCart = [];
+                renderPOSCart();
                 loginScreen.style.display = 'flex'; 
                 appContainer.style.display = 'none'; 
                 bottomNav.style.display = 'none';
@@ -861,57 +1180,83 @@
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const loginError = document.getElementById('login-error');
+            loginError.style.display = 'none';
             try {
-                // تسجيل الدخول على آيتن أولاً (الأساسي)
                 await signInWithEmailAndPassword(authAyten, email, password);
-                // محاولة تسجيل الدخول في المديونيات حتى لو قواعد الحماية هناك مقفولة
-                try { await signInWithEmailAndPassword(authDebts, email, password); } catch(e){} 
+                try {
+                    await signInWithEmailAndPassword(authDebts, email, password);
+                } catch(debtErr) {
+                    console.warn('debts auth failed:', debtErr);
+                    setTimeout(() => showToast("⚠️ تم الدخول لكن المديونيات قد لا تعمل — تحقق من حساب Firebase"), 500);
+                }
             } catch(err) {
-                document.getElementById('login-error').style.display = 'block'; 
-                document.getElementById('login-error').innerText = "بيانات الدخول غير صحيحة!";
+                loginError.style.display = 'block';
+                loginError.innerText = "بيانات الدخول غير صحيحة!";
             }
         });
+
+        document.getElementById('posForm').addEventListener('submit', (e) => e.preventDefault());
         
         document.getElementById('logoutBtnPos').addEventListener('click', () => {
             signOut(authAyten); signOut(authDebts);
         });
 
-        // المديونيات متصلة بـ dbDebts الخاص بـ Al-shaikh
+        function renderCustomersList() {
+            const list = document.getElementById('customersList');
+            const totalBar = document.getElementById('debtsGrandTotal');
+            const totalAmountEl = document.getElementById('debtsGrandTotalAmount');
+            list.innerHTML = '';
+            let grandDebts = 0;
+
+            if (customersData.length === 0) {
+                totalBar.style.display = 'none';
+                list.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>لا يوجد مديونيات مسجلة</p></div>`;
+                return;
+            }
+
+            customersData.forEach((data) => {
+                grandDebts += data.totalDebt;
+                const phoneHtml = data.phone ? `<span class="phone"><i class="fas fa-phone-alt"></i> ${escapeHtml(data.phone)}</span>` : '';
+                list.innerHTML += `
+                    <div class="customer-card glass-panel" data-customer-id="${escapeHtml(data.id)}" onclick="openWorkspace(this.dataset.customerId)">
+                        <div class="cust-info">
+                            <span class="name"><i class="fas fa-user"></i> ${escapeHtml(data.name)}</span>
+                            ${phoneHtml}
+                        </div>
+                        <div class="cust-amount">${data.totalDebt} ج</div>
+                    </div>
+                `;
+            });
+
+            totalBar.style.display = 'flex';
+            totalAmountEl.innerText = grandDebts + ' ج.م';
+        }
+
+        // المديونيات فقط → dbDebts (alshaikh-1c6c0) / collection: customers
         function loadCustomers() {
-            onSnapshot(collection(dbDebts, "customers"), (snapshot) => {
+            if(unsubCustomers) unsubCustomers();
+            unsubCustomers = onSnapshot(collection(dbDebts, "customers"), (snapshot) => {
                 customersData = [];
-                const list = document.getElementById('customersList'); list.innerHTML = '';
                 
-                if (snapshot.empty) {
-                    list.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>لا يوجد مديونيات مسجلة</p></div>`;
-                } else {
-                    snapshot.forEach((doc) => {
-                        const data = doc.data(); data.id = doc.id;
-                        if(!data.items) data.items = [];
-                        let total = 0;
-                        data.items.forEach(i => {
-                            if(i.type === 'payment') total -= i.price;
-                            else total += (i.qty * i.price);
-                        });
-                        data.totalDebt = total; customersData.push(data);
+                snapshot.forEach((docSnap) => {
+                    const data = docSnap.data(); data.id = docSnap.id;
+                    if(!data.items) data.items = [];
+                    let total = 0;
+                    data.items.forEach(i => {
+                        if(i.type === 'payment') total -= i.price;
+                        else total += (i.qty * i.price);
                     });
+                    data.totalDebt = total; customersData.push(data);
+                });
 
-                    customersData.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
-
-                    customersData.forEach((data) => {
-                        let phoneHtml = data.phone ? `<span class="phone"><i class="fas fa-phone-alt"></i> ${data.phone}</span>` : '';
-                        list.innerHTML += `
-                            <div class="customer-card glass-panel" onclick="openWorkspace('${data.id}')">
-                                <div class="cust-info">
-                                    <span class="name"><i class="fas fa-user"></i> ${data.name}</span>
-                                    ${phoneHtml}
-                                </div>
-                                <div class="cust-amount">${data.totalDebt} ج</div>
-                            </div>
-                        `;
-                    });
-                }
+                customersData.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+                renderCustomersList();
+                if (document.getElementById('searchInput').value) filterCustomers();
                 if (currentCustomerId) renderWorkspace();
+            }, (error) => {
+                console.error('debts db error:', error);
+                showToast("❌ تعذر الاتصال بقاعدة المديونيات");
             });
         }
 
@@ -925,8 +1270,12 @@
             const name = document.getElementById('newCustomerName').value.trim();
             const phone = document.getElementById('newCustomerPhone').value.trim();
             if(!name) return;
-            await addDoc(collection(dbDebts, "customers"), { name, phone, items: [], createdAt: serverTimestamp() });
-            e.target.reset(); showToast("<i class='fas fa-check-circle'></i> تم إضافة العميل");
+            try {
+                await addDoc(collection(dbDebts, "customers"), { name, phone, items: [], createdAt: serverTimestamp() });
+                e.target.reset(); showToast("<i class='fas fa-check-circle'></i> تم إضافة العميل");
+            } catch(err) {
+                showToast("❌ فشل إضافة العميل — تحقق من الاتصال");
+            }
         });
 
         window.openWorkspace = function(id) { 
@@ -942,29 +1291,42 @@
         document.getElementById('addItemForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const c = customersData.find(c => c.id === currentCustomerId);
+            if(!c) { showToast("❌ العميل غير موجود"); return; }
             const row = e.target;
             const newItem = { 
                 type: 'debt', date: getLocalDateString(), 
-                name: row.querySelector('.i-name').value, 
+                name: row.querySelector('.i-name').value.trim(), 
                 qty: parseFloat(row.querySelector('.i-qty').value), 
                 price: parseFloat(row.querySelector('.i-price').value) 
             };
-            await updateDoc(doc(dbDebts, "customers", currentCustomerId), { items: [...c.items, newItem] });
-            e.target.reset(); row.querySelector('.i-name').focus();
+            if(!newItem.name || isNaN(newItem.qty) || isNaN(newItem.price)) { showToast("يرجى ملء كل البيانات"); return; }
+            try {
+                await updateDoc(doc(dbDebts, "customers", currentCustomerId), { items: [...c.items, newItem] });
+                e.target.reset(); row.querySelector('.i-name').focus();
+            } catch(err) {
+                showToast("❌ فشل التسجيل");
+            }
         });
 
         document.getElementById('addPaymentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const c = customersData.find(c => c.id === currentCustomerId);
-            const newItem = { type: 'payment', date: getLocalDateString(), name: 'دفعة مسددة', qty: 1, price: parseFloat(document.getElementById('paymentAmount').value) };
-            await updateDoc(doc(dbDebts, "customers", currentCustomerId), { items: [...c.items, newItem] });
-            e.target.reset();
+            if(!c) { showToast("❌ العميل غير موجود"); return; }
+            const amount = parseFloat(document.getElementById('paymentAmount').value);
+            if(isNaN(amount) || amount <= 0) { showToast("يرجى إدخال مبلغ صحيح"); return; }
+            const newItem = { type: 'payment', date: getLocalDateString(), name: 'دفعة مسددة', qty: 1, price: amount };
+            try {
+                await updateDoc(doc(dbDebts, "customers", currentCustomerId), { items: [...c.items, newItem] });
+                e.target.reset();
+            } catch(err) {
+                showToast("❌ فشل التسجيل");
+            }
         });
 
         function renderWorkspace() {
             const customer = customersData.find(c => c.id === currentCustomerId);
             if(!customer) return;
-            document.getElementById('currentCustomerName').innerHTML = `<span style="font-size: 19px; font-weight:900;"><i class="fas fa-user-circle"></i> ${customer.name}</span>`;
+            document.getElementById('currentCustomerName').innerHTML = `<span style="font-size: 19px; font-weight:900;"><i class="fas fa-user-circle"></i> ${escapeHtml(customer.name)}</span>`;
 
             const list = document.getElementById('debtsList'); list.innerHTML = '';
             
@@ -977,26 +1339,45 @@
                         list.innerHTML += `
                             <div class="item-card is-pay glass-panel">
                                 <div class="item-details">
-                                    <span class="item-title"><i class="fas fa-arrow-down" style="color:var(--success);"></i> ${item.name}</span>
+                                    <span class="item-title"><i class="fas fa-arrow-down" style="color:var(--success);"></i> ${escapeHtml(item.name)}</span>
                                     <span class="item-meta"><i class="far fa-clock"></i> ${item.date}</span>
                                 </div>
-                                <div class="item-totals"><span class="item-price" style="color:var(--success);">- ${item.price} ج</span></div>
+                                <div class="item-totals">
+                                    <span class="item-price" style="color:var(--success);">- ${item.price} ج</span>
+                                    <button onclick="deleteDebtItem(${index})" class="btn-delete" title="حذف"><i class="fas fa-trash-alt"></i></button>
+                                </div>
                             </div>
                         `;
                     } else {
                         list.innerHTML += `
                             <div class="item-card is-debt glass-panel">
                                 <div class="item-details">
-                                    <span class="item-title"><i class="fas fa-shopping-bag" style="color:var(--text-main);"></i> ${item.name}</span>
+                                    <span class="item-title"><i class="fas fa-shopping-bag" style="color:var(--text-main);"></i> ${escapeHtml(item.name)}</span>
                                     <span class="item-meta"><i class="far fa-clock"></i> ${item.date} • السعر: ${item.price} • العدد: ${item.qty}</span>
                                 </div>
-                                <div class="item-totals"><span class="item-price">${total} ج</span></div>
+                                <div class="item-totals">
+                                    <span class="item-price">${total} ج</span>
+                                    <button onclick="deleteDebtItem(${index})" class="btn-delete" title="حذف"><i class="fas fa-trash-alt"></i></button>
+                                </div>
                             </div>
                         `;
                     }
                 });
             }
             document.getElementById('grandTotalAmount').innerText = customer.totalDebt + " ج.م";
+        }
+
+        window.deleteDebtItem = async function(index) {
+            if (!confirm('حذف هذه الحركة من حساب العميل؟')) return;
+            const c = customersData.find(c => c.id === currentCustomerId);
+            if (!c) return;
+            try {
+                const newItems = c.items.filter((_, i) => i !== index);
+                await updateDoc(doc(dbDebts, "customers", currentCustomerId), { items: newItems });
+                showToast("✅ تم حذف الحركة");
+            } catch (e) {
+                showToast("❌ فشل الحذف");
+            }
         }
 
         window.deleteCustomer = async function() {
@@ -1007,13 +1388,14 @@
 
         window.printInvoice = function() {
             const c = customersData.find(c => c.id === currentCustomerId);
+            if(!c) { showToast("❌ لا يوجد عميل محدد"); return; }
             let html = `
                 <img src="احمد الشيخ (3).png" class="print-watermark" alt="Watermark">
                 <div class="print-header">
                     <h2>محلات أحمد الشيخ</h2>
                     <h3 style="color:#555;">كشف حساب عميل مفصل (آجل)</h3>
                     <div style="display:flex; justify-content:space-between; margin-top:15px; font-weight:bold;">
-                        <span>العميل: ${c.name}</span>
+                        <span>العميل: ${escapeHtml(c.name)}</span>
                         <span>التاريخ: ${getLocalDateString()}</span>
                     </div>
                 </div>
@@ -1026,9 +1408,9 @@
             } else {
                 c.items.forEach(i => {
                     if(i.type === 'payment') {
-                        html += `<tr><td><strong>${i.name}</strong></td><td>${i.date}</td><td>-</td><td style="color:green; direction:ltr; text-align:right;">- ${i.price} ج</td></tr>`;
+                        html += `<tr><td><strong>${escapeHtml(i.name)}</strong></td><td>${escapeHtml(i.date)}</td><td>-</td><td style="color:green; direction:ltr; text-align:right;">- ${i.price} ج</td></tr>`;
                     } else {
-                        html += `<tr><td>${i.name}</td><td>${i.date}</td><td>العدد: ${i.qty} × ${i.price} ج</td><td>${i.qty * i.price} ج</td></tr>`;
+                        html += `<tr><td>${escapeHtml(i.name)}</td><td>${escapeHtml(i.date)}</td><td>العدد: ${i.qty} × ${i.price} ج</td><td>${i.qty * i.price} ج</td></tr>`;
                     }
                 });
             }
