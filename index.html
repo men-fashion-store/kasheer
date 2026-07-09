@@ -4,45 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#ffffff">
-    <link rel="icon" type="image/jpeg" href="dfaa70b3-1828-475b-a413-7df2e374ab9a.jfif">
+    <link rel="icon" type="image/png" href="احمد الشيخ (3).png">
     <title>أحمد الشيخ - نظام الكاشير والمديونيات</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* --- المتغيرات والتصميم الزجاجي --- */
+        /* --- المتغيرات والتصميم الزجاجي ثلاثي الأبعاد --- */
         :root {
             --primary-zayti: #3E4F1A; 
             --primary-zayti-hover: #2e3b13;
-            --bg-page: #ffffff; 
+            --bg-page: #f0f2f5; 
             
-            --glass-bg: rgba(245, 245, 245, 0.45);
-            --workspace-glass: rgba(245, 245, 245, 0.7); 
-            --glass-border: rgba(0, 0, 0, 0.05);
-            --glass-shadow: 0 8px 32px 0 rgba(62, 79, 26, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.55);
+            --workspace-glass: rgba(245, 245, 245, 0.85); 
+            --glass-border-light: rgba(255, 255, 255, 0.7);
+            --glass-border-dark: rgba(0, 0, 0, 0.05);
+            --glass-shadow: 0 10px 30px 0 rgba(62, 79, 26, 0.1);
             
             --text-main: #3E4F1A;
             --text-muted: #5a6b3d;
-            --input-bg: rgba(255, 255, 255, 0.8);
+            --input-bg: rgba(255, 255, 255, 0.9);
             --danger: #d9534f;
             --success: #25D366;
             --info: #007bff; 
             --warning: #f0ad4e;
-            --transition: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            --transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         body.dark-mode {
             --primary-zayti: #8ba84b; 
             --primary-zayti-hover: #a1c25a;
-            --bg-page: #000000;
+            --bg-page: #0f120c;
             
-            --glass-bg: rgba(20, 25, 15, 0.55);
-            --workspace-glass: rgba(15, 18, 12, 0.85); 
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+            --glass-bg: rgba(30, 35, 25, 0.55);
+            --workspace-glass: rgba(20, 25, 18, 0.85); 
+            --glass-border-light: rgba(255, 255, 255, 0.15);
+            --glass-border-dark: rgba(0, 0, 0, 0.5);
+            --glass-shadow: 0 10px 30px 0 rgba(0, 0, 0, 0.8);
             
-            --text-main: #8ba84b;
+            --text-main: #b8d47b;
             --text-muted: #a0aab5;
-            --input-bg: rgba(30, 30, 30, 0.6);
+            --input-bg: rgba(25, 30, 20, 0.7);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; -webkit-tap-highlight-color: transparent; }
@@ -56,109 +58,235 @@
             transition: background-color var(--transition), color var(--transition);
         }
 
+        /* --- اللوجو في الخلفية --- */
         .app-watermark {
             position: fixed; top: 50%; left: 50%; 
-            transform: translate(-50%, -50%) perspective(600px) rotateX(15deg) rotateY(-10deg) scale(1.4);
+            transform: translate(-50%, -50%) perspective(800px) rotateX(10deg) rotateY(-5deg) scale(1.2);
             width: 85vw; max-width: 450px; 
-            opacity: 0.04; 
-            filter: drop-shadow(20px 20px 25px rgba(0,0,0,0.5));
+            opacity: 0.05; 
+            filter: drop-shadow(0px 20px 30px rgba(0,0,0,0.3));
             pointer-events: none; z-index: 0;
             transition: var(--transition);
+            border-radius: 30px;
+        }
+        body.dark-mode .app-watermark { opacity: 0.08; filter: drop-shadow(0px 20px 40px rgba(0,0,0,0.9)); }
+
+        /* --- التأثير الزجاجي ثلاثي الأبعاد --- */
+        .glass-panel { 
+            background: var(--glass-bg); 
+            backdrop-filter: blur(20px); 
+            -webkit-backdrop-filter: blur(20px); 
+            border-top: 1.5px solid var(--glass-border-light);
+            border-left: 1.5px solid var(--glass-border-light);
+            border-right: 1px solid var(--glass-border-dark);
+            border-bottom: 1px solid var(--glass-border-dark);
+            box-shadow: var(--glass-shadow), inset 0 2px 15px rgba(255,255,255,0.1); 
             border-radius: 20px;
         }
-        body.dark-mode .app-watermark { opacity: 0.06; filter: drop-shadow(20px 20px 25px rgba(0,0,0,0.8)) invert(0.2); }
 
-        .glass-panel { background: var(--glass-bg); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
-
-        .btn, .input-clean { border-radius: 14px; outline: none; transition: var(--transition); }
-        .input-clean { background: var(--input-bg); border: 1px solid var(--glass-border); color: var(--text-main); padding: 12px 16px; font-size: 15px; width: 100%; backdrop-filter: blur(8px); }
-        .input-clean:focus { border-color: var(--primary-zayti); box-shadow: 0 0 0 3px rgba(62, 79, 26, 0.2); }
-        .input-clean::placeholder { color: var(--text-muted); opacity: 0.8; }
+        .btn, .input-clean { outline: none; transition: var(--transition); }
         
-        .btn-primary { background: var(--primary-zayti); color: #fff; padding: 14px; font-size: 16px; font-weight: bold; width: 100%; cursor: pointer; border: none; box-shadow: 0 4px 15px rgba(62, 79, 26, 0.4); }
-        .btn-primary:active { transform: scale(0.96); background: var(--primary-zayti-hover); }
+        .input-clean { 
+            background: var(--input-bg); 
+            border: 1px solid var(--glass-border-dark); 
+            border-top: 1px solid rgba(0,0,0,0.1);
+            border-left: 1px solid rgba(0,0,0,0.1);
+            color: var(--text-main); 
+            padding: 12px 16px; 
+            font-size: 15px; 
+            width: 100%; 
+            border-radius: 16px;
+            box-shadow: inset 0 3px 6px rgba(0,0,0,0.04);
+        }
+        .input-clean:focus { 
+            border-color: var(--primary-zayti); 
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.05), 0 0 0 4px rgba(62, 79, 26, 0.15); 
+        }
+        .input-clean::placeholder { color: var(--text-muted); opacity: 0.7; }
+        
+        /* --- أزرار 3D --- */
+        .btn {
+            border-radius: 16px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-primary { 
+            background: linear-gradient(145deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%);
+            color: #fff; 
+            padding: 14px; 
+            font-size: 17px; 
+            font-weight: 900; 
+            width: 100%; 
+            border: none; 
+            box-shadow: 0 8px 20px rgba(62, 79, 26, 0.3), inset 0 2px 0 rgba(255,255,255,0.2), inset 0 -3px 0 rgba(0,0,0,0.3);
+        }
+        .btn-primary:active { 
+            transform: translateY(4px); 
+            box-shadow: 0 2px 5px rgba(62, 79, 26, 0.4), inset 0 2px 5px rgba(0,0,0,0.4); 
+        }
 
         /* Navigation Menu */
-        .main-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 70px; background: var(--glass-bg); backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-around; align-items: center; z-index: 100; box-shadow: 0 -5px 20px rgba(0,0,0,0.05); padding-bottom: env(safe-area-inset-bottom); }
-        .nav-btn { background: none; border: none; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; gap: 4px; width: 33%; height: 100%; cursor: pointer; transition: 0.3s; font-weight: bold; }
-        .nav-btn i { font-size: 22px; transition: 0.3s; }
+        .main-nav { 
+            position: fixed; bottom: 15px; left: 15px; right: 15px; height: 75px; 
+            background: var(--glass-bg); backdrop-filter: blur(25px); 
+            border-top: 1.5px solid var(--glass-border-light);
+            border-left: 1.5px solid var(--glass-border-light);
+            border-radius: 25px;
+            display: flex; justify-content: space-around; align-items: center; 
+            z-index: 100; box-shadow: 0 10px 40px rgba(0,0,0,0.1); 
+            padding: 0 10px;
+        }
+        .nav-btn { 
+            background: none; border: none; color: var(--text-muted); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            font-size: 13px; gap: 6px; width: 33%; height: 100%; cursor: pointer; 
+            transition: 0.3s; font-weight: 800; 
+        }
+        .nav-btn i { font-size: 24px; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         .nav-btn.active { color: var(--primary-zayti); }
-        .nav-btn.active i { transform: translateY(-3px) scale(1.1); text-shadow: 0 4px 10px rgba(62, 79, 26, 0.3); }
+        .nav-btn.active i { transform: translateY(-5px) scale(1.2); text-shadow: 0 10px 20px rgba(62, 79, 26, 0.4); }
 
         #login-screen { position: absolute; inset: 0; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; display: none; background: var(--bg-page); }
-        .login-box { padding: 40px 30px; border-radius: 24px; width: 100%; max-width: 400px; text-align: center; z-index: 1; }
-        .login-box img { width: 120px; height: 120px; border-radius: 20px; object-fit: cover; margin-bottom: 20px; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1)); background: #fff;}
+        .login-box { padding: 40px 30px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; z-index: 1; }
+        .login-box img { width: 130px; height: 130px; border-radius: 25px; object-fit: cover; margin-bottom: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.5); background: #fff; border: 3px solid rgba(255,255,255,0.8);}
 
-        #app-container { display: none; position: relative; width: 100%; height: calc(100% - 70px); overflow: hidden; }
+        #app-container { display: none; position: relative; width: 100%; height: calc(100% - 100px); overflow: hidden; }
         .main-view { position: absolute; inset: 0; display: none; flex-direction: column; overflow: hidden; }
         .main-view.active { display: flex; }
 
-        header { background: var(--glass-bg); backdrop-filter: blur(20px); border-bottom: 1px solid var(--glass-border); color: var(--text-main); height: 75px; display: flex; justify-content: space-between; align-items: center; padding: 0 20px; flex-shrink: 0; z-index: 10; box-shadow: 0 4px 30px rgba(0,0,0,0.05); }
-        .header-title { display: flex; align-items: center; gap: 12px; font-size: 19px; font-weight: 900; }
-        .header-title img { width: 42px; height: 42px; object-fit: cover; background: rgba(255,255,255,0.8); border-radius: 12px; padding: 2px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        header { 
+            background: var(--glass-bg); backdrop-filter: blur(20px); 
+            border-bottom: 1px solid var(--glass-border-dark); 
+            border-top: 1px solid var(--glass-border-light);
+            color: var(--text-main); height: 85px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 20px; flex-shrink: 0; z-index: 10; 
+            box-shadow: 0 4px 30px rgba(0,0,0,0.05); 
+            margin-bottom: 5px;
+            border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;
+        }
+        .header-title { display: flex; align-items: center; gap: 12px; font-size: 20px; font-weight: 900; text-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .header-title img { width: 48px; height: 48px; object-fit: cover; background: rgba(255,255,255,0.9); border-radius: 14px; padding: 2px; box-shadow: 0 5px 15px rgba(0,0,0,0.1), inset 0 2px 0 rgba(255,255,255,0.8); }
         
-        .header-btns { display: flex; gap: 8px; }
-        .btn-icon-top { background: var(--input-bg); border: 1px solid var(--glass-border); color: var(--text-main); width: 42px; height: 42px; border-radius: 12px; display: flex; justify-content: center; align-items: center; font-size: 18px; cursor: pointer; transition: 0.2s; }
-        .btn-icon-top:active { transform: scale(0.9); background: var(--primary-zayti); color: #fff; }
+        .header-btns { display: flex; gap: 10px; }
+        .btn-icon-top { 
+            background: var(--input-bg); 
+            border: 1px solid var(--glass-border-light); 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05), inset 0 2px 0 rgba(255,255,255,0.8);
+            color: var(--text-main); width: 45px; height: 45px; border-radius: 14px; 
+            display: flex; justify-content: center; align-items: center; font-size: 18px; 
+            cursor: pointer; transition: 0.2s; 
+        }
+        .btn-icon-top:active { transform: translateY(2px) scale(0.95); box-shadow: inset 0 2px 5px rgba(0,0,0,0.1); background: var(--primary-zayti); color: #fff; }
 
         .scroll-wrapper { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; z-index: 2; padding-bottom: 20px; }
         
         /* Shared lists and forms */
-        .top-bar-actions { padding: 20px 15px 10px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
+        .top-bar-actions { padding: 15px 20px 10px; display: flex; flex-direction: column; gap: 12px; flex-shrink: 0; }
         .search-wrapper { position: relative; display: flex; align-items: center; }
-        .search-wrapper i { position: absolute; right: 18px; color: var(--primary-zayti); font-size: 18px; z-index: 5; }
-        .search-wrapper input { padding-right: 45px; border-radius: 20px; z-index: 4; }
+        .search-wrapper i { position: absolute; right: 20px; color: var(--primary-zayti); font-size: 18px; z-index: 5; }
+        .search-wrapper input { padding-right: 50px; border-radius: 20px; z-index: 4; font-weight: bold; }
 
         /* Cashier specific */
         .cart-container { padding: 15px; flex: 1; overflow-y: auto; }
-        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-radius: 12px; margin-bottom: 8px; border-right: 5px solid var(--primary-zayti); background: var(--input-bg); }
+        .cart-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 15px; border-radius: 18px; margin-bottom: 12px; 
+            border-right: 6px solid var(--primary-zayti); 
+            background: var(--glass-bg);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.03), inset 0 2px 0 var(--glass-border-light);
+        }
         .cart-item.return-item { border-right-color: var(--danger); }
         
-        .daily-totals { display: flex; justify-content: space-between; background: var(--primary-zayti); color: white; padding: 15px 20px; border-radius: 16px; margin: 15px; font-weight: bold; font-size: 18px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        .daily-status { text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 10px; padding: 8px; border-radius: 8px; }
-        .status-open { background: rgba(37, 211, 102, 0.1); color: var(--success); }
-        .status-closed { background: rgba(217, 83, 79, 0.1); color: var(--danger); }
+        .daily-totals { 
+            display: flex; justify-content: space-between; 
+            background: linear-gradient(135deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%); 
+            color: white; padding: 20px; border-radius: 20px; margin: 15px 20px; 
+            font-weight: 900; font-size: 20px; 
+            box-shadow: 0 10px 25px rgba(62,79,26,0.3), inset 0 2px 0 rgba(255,255,255,0.2); 
+        }
+        .daily-status { text-align: center; font-size: 15px; font-weight: 900; margin: 5px 20px 15px; padding: 12px; border-radius: 15px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+        .status-open { background: rgba(37, 211, 102, 0.15); color: var(--success); border: 1px solid rgba(37, 211, 102, 0.3); }
+        .status-closed { background: rgba(217, 83, 79, 0.15); color: var(--danger); border: 1px solid rgba(217, 83, 79, 0.3); }
 
         /* Customer specific */
-        .add-customer-form { display: flex; flex-direction: column; gap: 8px; }
-        .add-customer-row { display: flex; gap: 8px; }
-        .add-customer-row button { width: 65px; background: var(--text-main); color: var(--bg-page); border-radius: 16px; font-size: 20px; border: none; display:flex; justify-content:center; align-items:center;}
-        .customer-card { padding: 20px; border-radius: 20px; margin-bottom: 15px; margin-inline: 15px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: transform 0.2s; }
-        .customer-card:active { transform: scale(0.98); }
-        .cust-info .name { font-size: 17px; font-weight: 900; display: flex; align-items: center; gap: 8px; margin-bottom: 4px; color: var(--text-main); }
-        .cust-info .phone, .cust-info .date { font-size: 13px; color: var(--text-muted); margin-bottom: 4px; display: block; font-weight: 500; }
-        .cust-amount { font-size: 18px; font-weight: 900; direction: ltr; color: var(--primary-zayti); text-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .add-customer-form { display: flex; flex-direction: column; gap: 10px; }
+        .add-customer-row { display: flex; gap: 10px; }
+        .add-customer-row button { 
+            width: 70px; background: linear-gradient(145deg, var(--text-main), var(--text-muted)); 
+            color: var(--bg-page); border-radius: 16px; font-size: 20px; border: none; 
+            display:flex; justify-content:center; align-items:center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1), inset 0 2px 0 rgba(255,255,255,0.2);
+        }
+        .add-customer-row button:active { transform: translateY(3px); }
+        
+        .customer-card { 
+            padding: 20px; margin-bottom: 15px; margin-inline: 20px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; 
+        }
+        .customer-card:active { transform: scale(0.97) translateY(2px); box-shadow: 0 5px 10px rgba(0,0,0,0.1); }
+        .cust-info .name { font-size: 18px; font-weight: 900; display: flex; align-items: center; gap: 10px; margin-bottom: 6px; color: var(--text-main); }
+        .cust-info .phone, .cust-info .date { font-size: 14px; color: var(--text-muted); margin-bottom: 4px; display: block; font-weight: 700; }
+        .cust-amount { font-size: 20px; font-weight: 900; direction: ltr; color: var(--primary-zayti); text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
 
         /* Workspace */
-        #screen-workspace { position: absolute; inset: 0; transform: translateX(-100%); z-index: 200; background: var(--workspace-glass); backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px); display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        #screen-workspace { 
+            position: absolute; inset: 0; transform: translateX(-100%); z-index: 200; 
+            background: var(--workspace-glass); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px); 
+            display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); 
+        }
         #screen-workspace.active { transform: translateX(0); }
-        .workspace-forms { padding: 15px; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; border-bottom: 1px solid var(--glass-border); background: var(--glass-bg); }
-        .form-row { display: flex; gap: 8px; align-items: center; }
-        .btn-action { width: 100%; border-radius: 14px; color: white; border: none; font-size: 16px; padding: 12px; font-weight: bold; margin-top: 5px; cursor: pointer;}
-        .btn-add-debt { background: var(--primary-zayti); }
-        .btn-add-return { background: var(--warning); color: #000; }
-        .btn-add-pay { background: var(--text-main); color: var(--bg-page); width: 65px; border-radius: 14px; border: none; font-size: 20px; display: flex; justify-content: center; align-items: center; }
+        .workspace-forms { 
+            padding: 20px; display: flex; flex-direction: column; gap: 15px; flex-shrink: 0; 
+            border-bottom: 1px solid var(--glass-border-dark); background: var(--glass-bg); 
+            border-bottom-left-radius: 25px; border-bottom-right-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        .form-row { display: flex; gap: 10px; align-items: center; }
+        .btn-action { 
+            width: 100%; border-radius: 16px; color: white; border: none; 
+            font-size: 17px; padding: 14px; font-weight: 900; margin-top: 5px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.2), inset 0 -3px 0 rgba(0,0,0,0.2);
+        }
+        .btn-action:active { transform: translateY(3px); box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .btn-add-debt { background: linear-gradient(145deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%); }
+        .btn-add-return { background: linear-gradient(145deg, #f0ad4e 0%, #e09b3d 100%); color: #000; text-shadow: 0 1px 2px rgba(255,255,255,0.5); }
+        
+        .btn-add-pay { 
+            background: linear-gradient(145deg, var(--text-main), var(--text-muted)); 
+            color: var(--bg-page); width: 70px; border-radius: 16px; border: none; 
+            font-size: 22px; display: flex; justify-content: center; align-items: center; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15), inset 0 2px 0 rgba(255,255,255,0.2), inset 0 -3px 0 rgba(0,0,0,0.2);
+        }
+        .btn-add-pay:active { transform: translateY(3px); }
 
-        .item-card { border-radius: 18px; padding: 18px; margin-bottom: 15px; margin-inline: 15px; position: relative; overflow: hidden; display: flex; justify-content: space-between; align-items: center; }
-        .item-card::before { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 8px; }
+        .item-card { 
+            padding: 18px 20px; margin-bottom: 15px; margin-inline: 20px; position: relative; overflow: hidden; 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+        .item-card::before { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 10px; box-shadow: inset -2px 0 5px rgba(0,0,0,0.1);}
         .item-card.is-debt::before { background: var(--primary-zayti); }
         .item-card.is-return::before { background: var(--warning); }
         .item-card.is-pay::before { background: var(--success); }
 
-        .item-title { font-weight: 900; font-size: 16px; display: flex; align-items: center; gap: 8px; color: var(--text-main); margin-bottom: 4px; }
-        .item-meta { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+        .item-title { font-weight: 900; font-size: 17px; display: flex; align-items: center; gap: 8px; color: var(--text-main); margin-bottom: 6px; }
+        .item-meta { font-size: 14px; color: var(--text-muted); font-weight: 700; }
         .item-totals { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-        .item-price { font-size: 17px; font-weight: 900; direction: ltr;}
+        .item-price { font-size: 19px; font-weight: 900; direction: ltr; text-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .is-return .item-price { color: var(--warning); }
         
-        .btn-delete { background: rgba(255,0,0,0.1); border: none; color: var(--danger); font-size: 16px; padding: 6px 10px; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .btn-delete { background: rgba(217,83,79,0.1); border: 1px solid rgba(217,83,79,0.2); color: var(--danger); font-size: 16px; padding: 8px 12px; border-radius: 10px; cursor: pointer; transition: 0.2s; font-weight:bold; }
+        .btn-delete:active { background: var(--danger); color: white; }
 
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); opacity: 0.6; }
-        .empty-state i { font-size: 40px; margin-bottom: 15px; }
+        .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); opacity: 0.7; font-weight: 800; font-size: 18px; }
+        .empty-state i { font-size: 50px; margin-bottom: 20px; display: block; color: var(--primary-zayti); opacity: 0.5; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); }
 
-        #loader { position: fixed; inset: 0; background: var(--bg-page); z-index: 9999; display: flex; justify-content: center; align-items: center; font-size: 22px; color: var(--primary-zayti); font-weight: 900; }
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--text-main); color: var(--bg-page); padding: 14px 28px; border-radius: 30px; font-weight: bold; font-size: 15px; opacity: 0; pointer-events: none; transition: var(--transition); z-index: 10000; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        #toast.show { opacity: 1; top: 40px; }
+        #loader { position: fixed; inset: 0; background: var(--bg-page); z-index: 9999; display: flex; flex-direction:column; justify-content: center; align-items: center; font-size: 24px; color: var(--primary-zayti); font-weight: 900; text-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--text-main); color: var(--bg-page); padding: 16px 32px; border-radius: 30px; font-weight: 900; font-size: 16px; opacity: 0; pointer-events: none; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10000; box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.2); }
+        #toast.show { opacity: 1; top: 50px; }
 
         /* --- إعدادات الطباعة للـ PDF --- */
         #printArea { display: none; }
@@ -168,32 +296,38 @@
             #printArea, #printArea * { visibility: visible; }
             #printArea { display: block; position: absolute; left: 0; top: 0; width: 100%; min-height: 100vh; padding: 20px; background: white; color: black; direction: rtl; font-family: 'Tajawal', sans-serif; }
             .print-table { width: 100%; border-collapse: collapse; margin-top: 20px; position: relative; z-index: 2; }
-            .print-table th, .print-table td { border: 1px solid #ddd; padding: 12px; text-align: right; font-size: 15px;}
-            .print-table th { background-color: #f2f2f2; font-weight: bold; }
-            .print-header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #333; padding-bottom: 10px; position: relative; z-index: 2; }
-            .print-total { text-align: left; font-size: 22px; font-weight: bold; margin-top: 20px; position: relative; z-index: 2; border: 2px solid #333; display: inline-block; padding: 10px 20px; background: #f9f9f9; float: left; }
-            .print-watermark { position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 450px; opacity: 0.06; z-index: 0; pointer-events: none; border-radius: 20px; }
+            .print-table th, .print-table td { border: 1px solid #ddd; padding: 12px; text-align: right; font-size: 16px; font-weight: bold;}
+            .print-table th { background-color: #f2f2f2; font-weight: 900; }
+            .print-header { text-align: center; margin-bottom: 30px; border-bottom: 3px solid #333; padding-bottom: 15px; position: relative; z-index: 2; }
+            .print-total { text-align: left; font-size: 24px; font-weight: 900; margin-top: 20px; position: relative; z-index: 2; border: 3px solid #333; display: inline-block; padding: 15px 25px; background: #f9f9f9; float: left; border-radius: 10px; }
+            .print-watermark { position: fixed; top: 45%; left: 50%; transform: translate(-50%, -50%); width: 450px; opacity: 0.08; z-index: 0; pointer-events: none; border-radius: 20px; filter: grayscale(100%); }
             .main-nav { display: none !important; } 
         }
     </style>
 </head>
 <body> 
 
-    <img src="dfaa70b3-1828-475b-a413-7df2e374ab9a.jfif" class="app-watermark" alt="خلفية">
+    <!-- اللوجو الجديد كخلفية مائية ثلاثية الأبعاد -->
+    <img src="احمد الشيخ (3).png" class="app-watermark" alt="خلفية أحمد الشيخ">
 
-    <div id="loader">جاري التحميل...</div>
+    <div id="loader">
+        <i class="fas fa-spinner fa-spin" style="margin-bottom:15px; font-size:40px;"></i>
+        جاري تهيئة النظام...
+    </div>
+    
     <div id="toast">رسالة</div>
     <div id="printArea"></div>
 
+    <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
         <div class="login-box glass-panel">
-            <img src="dfaa70b3-1828-475b-a413-7df2e374ab9a.jfif" alt="أحمد الشيخ">
-            <h2 style="margin-bottom:25px; color:var(--text-main); font-weight:900;">تسجيل الدخول</h2>
+            <img src="احمد الشيخ (3).png" alt="أحمد الشيخ">
+            <h2 style="margin-bottom:25px; color:var(--text-main); font-weight:900; text-shadow: 0 2px 5px rgba(0,0,0,0.1);">تسجيل الدخول</h2>
             <form id="loginForm">
                 <input type="email" id="email" class="input-clean" style="margin-bottom:15px;" required placeholder="البريد الإلكتروني">
                 <input type="password" id="password" class="input-clean" style="margin-bottom:25px;" required placeholder="كلمة المرور">
                 <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> دخول للنظام</button>
-                <p id="login-error" style="color:var(--danger); margin-top:15px; display:none; font-weight:bold;"></p>
+                <p id="login-error" style="color:var(--danger); margin-top:15px; display:none; font-weight:900; background: rgba(217,83,79,0.1); padding:10px; border-radius:10px;"></p>
             </form>
         </div>
     </div>
@@ -204,7 +338,7 @@
         <div id="view-cashier" class="main-view active">
             <header>
                 <div class="header-title">
-                    <img src="dfaa70b3-1828-475b-a413-7df2e374ab9a.jfif" alt="Logo">
+                    <img src="احمد الشيخ (3).png" alt="Logo">
                     <span>الكاشير (بيع مباشر)</span>
                 </div>
                 <div class="header-btns">
@@ -214,26 +348,26 @@
             </header>
             
             <div class="scroll-wrapper">
-                <div class="workspace-forms" style="margin: 15px; border-radius: 16px;">
+                <div class="workspace-forms glass-panel" style="margin: 20px; border-radius: 20px;">
                     <form id="posForm">
                         <div class="form-row">
                             <input type="text" id="posItemName" class="input-clean" placeholder="الصنف (مثال: كوتشي أبيض)" required style="flex:2;">
                         </div>
-                        <div class="form-row" style="margin-top: 10px;">
+                        <div class="form-row" style="margin-top: 12px;">
                             <input type="number" id="posItemQty" class="input-clean" placeholder="العدد" min="1" value="1" required style="flex:1;">
                             <input type="number" id="posItemPrice" class="input-clean" placeholder="السعر" min="0" required style="flex:1;">
                         </div>
-                        <div class="form-row" style="margin-top: 10px; gap: 10px;">
+                        <div class="form-row" style="margin-top: 15px; gap: 12px;">
                             <button type="button" class="btn btn-action btn-add-debt" onclick="addToPOS('sale')"><i class="fas fa-cart-plus"></i> بيع مباشر</button>
                             <button type="button" class="btn btn-action btn-add-return" onclick="addToPOS('return')"><i class="fas fa-undo"></i> مرتجع</button>
                         </div>
                     </form>
                 </div>
                 
-                <h3 style="margin: 0 15px; font-weight: 800;"><i class="fas fa-shopping-basket"></i> سلة المعاملات الحالية:</h3>
+                <h3 style="margin: 0 20px; font-weight: 900; text-shadow: 0 2px 4px rgba(0,0,0,0.05);"><i class="fas fa-shopping-basket" style="color:var(--primary-zayti);"></i> سلة المعاملات الحالية:</h3>
                 <div id="posCart" class="cart-container"></div>
                 
-                <div style="padding: 15px;">
+                <div style="padding: 15px 20px;">
                     <button id="btnCompleteTransaction" class="btn btn-primary" onclick="completeTransaction()" style="display: none;"><i class="fas fa-check-circle"></i> إنهاء وترحيل لليومية</button>
                 </div>
             </div>
@@ -243,7 +377,7 @@
         <div id="view-daily" class="main-view">
             <header>
                 <div class="header-title">
-                    <img src="dfaa70b3-1828-475b-a413-7df2e374ab9a.jfif" alt="Logo">
+                    <img src="احمد الشيخ (3).png" alt="Logo">
                     <span>يومية المبيعات</span>
                 </div>
             </header>
@@ -255,18 +389,18 @@
                     </div>
                 </div>
                 
-                <div id="dailyStatusIndicator" class="daily-status"></div>
+                <div id="dailyStatusIndicator" class="daily-status glass-panel"></div>
 
-                <div class="daily-totals glass-panel">
+                <div class="daily-totals">
                     <span>صافي المبيعات:</span>
                     <span id="dailyNetTotal">0 ج.م</span>
                 </div>
 
-                <div id="dailyTransactionsList" class="list-container" style="padding-top: 0;"></div>
+                <div id="dailyTransactionsList" class="list-container" style="padding-top: 5px;"></div>
 
-                <div style="padding: 15px; display: flex; gap: 10px;">
-                    <button id="btnCloseDayBtn" class="btn btn-action" style="background: var(--danger);" onclick="closeCurrentDay()"><i class="fas fa-lock"></i> تقفيل اليومية</button>
-                    <button class="btn btn-action" style="background: var(--info);" onclick="printDailyReport()"><i class="fas fa-print"></i> طباعة الوردية</button>
+                <div style="padding: 15px 20px; display: flex; gap: 12px;">
+                    <button id="btnCloseDayBtn" class="btn btn-action" style="background: linear-gradient(145deg, var(--danger), #c9302c);" onclick="closeCurrentDay()"><i class="fas fa-lock"></i> تقفيل اليومية</button>
+                    <button class="btn btn-action" style="background: linear-gradient(145deg, var(--info), #0056b3);" onclick="printDailyReport()"><i class="fas fa-print"></i> طباعة الوردية</button>
                 </div>
             </div>
         </div>
@@ -275,22 +409,22 @@
         <div id="view-debts" class="main-view">
             <header>
                 <div class="header-title">
-                    <img src="dfaa70b3-1828-475b-a413-7df2e374ab9a.jfif" alt="Logo">
+                    <img src="احمد الشيخ (3).png" alt="Logo">
                     <span>سجل المديونيات</span>
                 </div>
             </header>
 
             <div class="scroll-wrapper">
                 <div class="top-bar-actions">
-                    <div class="search-wrapper">
+                    <div class="search-wrapper" style="margin-bottom:5px;">
                         <i class="fas fa-search"></i>
                         <input type="text" id="searchInput" class="input-clean" onkeyup="filterCustomers()" placeholder="ابحث عن اسم العميل...">
                     </div>
-                    <form id="addCustomerForm" class="add-customer-form">
+                    <form id="addCustomerForm" class="add-customer-form glass-panel" style="padding:15px; border-radius:20px; margin-top:5px;">
                         <input type="text" id="newCustomerName" class="input-clean" placeholder="اسم العميل الجديد..." required>
                         <div class="add-customer-row">
                             <input type="tel" id="newCustomerPhone" class="input-clean" placeholder="رقم الموبايل (اختياري)">
-                            <button type="submit" class="btn glass-panel" title="حفظ العميل"><i class="fas fa-user-plus"></i></button>
+                            <button type="submit" class="btn" title="حفظ العميل"><i class="fas fa-user-plus"></i></button>
                         </div>
                     </form>
                 </div>
@@ -302,9 +436,9 @@
         <div id="screen-workspace">
             <header>
                 <div class="header-title">
-                    <button onclick="closeWorkspace()" style="background:none; border:none; color:var(--text-main); font-size:22px; margin-left:12px; cursor:pointer;"><i class="fas fa-arrow-right"></i></button>
+                    <button onclick="closeWorkspace()" style="background:var(--input-bg); border:1px solid var(--glass-border-light); color:var(--text-main); font-size:20px; margin-left:12px; cursor:pointer; width:40px; height:40px; border-radius:12px; display:flex; justify-content:center; align-items:center; box-shadow:0 4px 10px rgba(0,0,0,0.05);"><i class="fas fa-arrow-right"></i></button>
                     <div id="currentCustomerName" style="display:flex; flex-direction:column; line-height: 1.2;">
-                        <span style="font-size: 18px;"><i class="fas fa-user-circle"></i> اسم العميل</span>
+                        <span style="font-size: 19px;"><i class="fas fa-user-circle"></i> اسم العميل</span>
                     </div>
                 </div>
                 <div class="header-btns">
@@ -316,16 +450,16 @@
             <div class="workspace-forms">
                 <form id="addItemForm">
                     <div class="form-row">
-                        <input type="text" class="input-clean i-name" placeholder="الصنف" required style="flex:2;">
+                        <input type="text" class="input-clean i-name" placeholder="تسجيل صنف آجل" required style="flex:2;">
                     </div>
-                    <div class="form-row" style="margin-top:8px;">
+                    <div class="form-row" style="margin-top:12px;">
                         <input type="number" class="input-clean i-qty" placeholder="العدد" min="1" value="1" required style="flex:1;">
                         <input type="number" class="input-clean i-price" placeholder="السعر" min="0" required style="flex:1;">
                     </div>
                     <button type="submit" class="btn btn-action btn-add-debt"><i class="fas fa-save"></i> تسجيل سحب آجل</button>
                 </form>
                 
-                <hr style="border: 0; border-top: 1px dashed rgba(0,0,0,0.1); margin: 5px 0;">
+                <hr style="border: 0; border-top: 2px dashed rgba(0,0,0,0.1); margin: 8px 0;">
 
                 <form id="addPaymentForm" class="form-row">
                     <input type="number" id="paymentAmount" class="input-clean" placeholder="مبلغ سداد نقدية" min="1" required style="flex:1;">
@@ -333,11 +467,11 @@
                 </form>
             </div>
 
-            <div class="scroll-wrapper" id="debtsList" style="padding-top: 15px;"></div>
+            <div class="scroll-wrapper" id="debtsList" style="padding-top: 20px;"></div>
 
-            <div style="padding: 15px; background: var(--glass-bg); border-top: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-size: 18px; font-weight: 800;">الرصيد المطلوب:</span>
-                <span id="grandTotalAmount" style="font-size: 24px; font-weight: 900; color: var(--primary-zayti);">0 ج.م</span>
+            <div class="glass-panel" style="margin: 15px; padding: 20px; display: flex; justify-content: space-between; align-items: center; border-radius: 20px;">
+                <span style="font-size: 19px; font-weight: 900;">الرصيد المطلوب:</span>
+                <span id="grandTotalAmount" style="font-size: 26px; font-weight: 900; color: var(--primary-zayti); text-shadow: 0 2px 4px rgba(0,0,0,0.1);">0 ج.م</span>
             </div>
         </div>
 
@@ -368,7 +502,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // UI Elements
         const loader = document.getElementById('loader');
         const loginScreen = document.getElementById('login-screen');
         const appContainer = document.getElementById('app-container');
@@ -379,7 +512,6 @@
         let customersData = []; 
         let posTempCart = [];
 
-        // Global Utility
         window.showToast = function(msg) {
             const t = document.getElementById('toast'); t.innerHTML = msg; t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 2500);
@@ -390,10 +522,10 @@
             const icons = document.querySelectorAll('.fa-moon, .fa-sun');
             if(document.body.classList.contains('dark-mode')) {
                 icons.forEach(i => i.className = 'fas fa-sun'); 
-                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#000000');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0f120c');
             } else {
                 icons.forEach(i => i.className = 'fas fa-moon'); 
-                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff');
+                document.querySelector('meta[name="theme-color"]').setAttribute('content', '#f0f2f5');
             }
         }
 
@@ -404,7 +536,6 @@
             return `${y}-${m}-${d}`;
         }
 
-        // Tab Switching Logic
         window.switchTab = function(tabName) {
             document.querySelectorAll('.main-view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
@@ -417,7 +548,6 @@
             }
         }
 
-        // --- 1. Offline POS Cashier Logic ---
         window.addToPOS = function(type) {
             const nameEl = document.getElementById('posItemName');
             const qtyEl = document.getElementById('posItemQty');
@@ -448,7 +578,7 @@
             let total = 0;
 
             if(posTempCart.length === 0) {
-                container.innerHTML = `<div class="empty-state"><p>السلة فارغة</p></div>`;
+                container.innerHTML = `<div class="empty-state"><i class="fas fa-shopping-cart"></i><p>سلة الكاشير فارغة</p></div>`;
                 document.getElementById('btnCompleteTransaction').style.display = 'none';
                 return;
             }
@@ -459,14 +589,14 @@
                 if(isReturn) total -= sub; else total += sub;
                 
                 container.innerHTML += `
-                    <div class="cart-item glass-panel ${isReturn ? 'return-item' : ''}">
+                    <div class="cart-item ${isReturn ? 'return-item' : ''}">
                         <div>
-                            <strong>${isReturn ? '🔄 مرتجع: ' : '🛍️ '}${item.name}</strong><br>
+                            <strong style="font-size:16px;">${isReturn ? '🔄 مرتجع: ' : '🛍️ '}${item.name}</strong><br>
                             <small class="item-meta">العدد: ${item.qty} | السعر: ${item.price} ج</small>
                         </div>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <strong style="color: ${isReturn ? 'var(--danger)' : 'var(--primary-zayti)'}">${isReturn ? '-' : ''}${sub} ج</strong>
-                            <button onclick="removeFromPOS(${item.id})" style="background:none; border:none; color:var(--danger); font-size:18px;"><i class="fas fa-times"></i></button>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <strong style="font-size:18px; color: ${isReturn ? 'var(--danger)' : 'var(--primary-zayti)'}">${isReturn ? '-' : ''}${sub} ج</strong>
+                            <button onclick="removeFromPOS(${item.id})" class="btn-delete"><i class="fas fa-times"></i></button>
                         </div>
                     </div>
                 `;
@@ -480,7 +610,6 @@
             if(posTempCart.length === 0) return;
             const today = getLocalDateString();
             
-            // تحقق إذا كان اليوم مقفل
             const closedDays = JSON.parse(localStorage.getItem('alshaikh_closed_days')) || {};
             if(closedDays[today]) {
                 showToast("❌ لا يمكن البيع. يومية اليوم مقفلة!");
@@ -504,7 +633,6 @@
             showToast("✅ تم الترحيل لليومية بنجاح");
         }
 
-        // --- 2. Daily Offline Logic ---
         window.loadDailyReport = function() {
             const date = document.getElementById('dailyDateSelector').value;
             if(!date) return;
@@ -522,32 +650,32 @@
 
             const isClosed = closedDays[date];
             if(isClosed) {
-                statusIndicator.className = 'daily-status status-closed';
+                statusIndicator.className = 'daily-status status-closed glass-panel';
                 statusIndicator.innerHTML = '<i class="fas fa-lock"></i> اليومية مقفلة ولا يمكن التعديل عليها';
                 closeBtn.style.display = 'none';
             } else {
-                statusIndicator.className = 'daily-status status-open';
+                statusIndicator.className = 'daily-status status-open glass-panel';
                 statusIndicator.innerHTML = '<i class="fas fa-lock-open"></i> اليومية مفتوحة';
                 closeBtn.style.display = date === getLocalDateString() ? 'block' : 'none';
             }
 
             if(transactions.length === 0) {
-                list.innerHTML = `<div class="empty-state"><i class="fas fa-file-invoice"></i><p>لا توجد مبيعات مسجلة في هذا اليوم</p></div>`;
+                list.innerHTML = `<div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><p>لا توجد مبيعات مسجلة في هذا اليوم</p></div>`;
             } else {
                 transactions.forEach((trans, tIndex) => {
                     grandTotal += trans.net;
                     let itemsHtml = trans.items.map(i => {
-                        return `<div style="display:flex; justify-content:space-between; font-size:13px; border-bottom:1px dashed rgba(0,0,0,0.1); padding:4px 0;">
+                        return `<div style="display:flex; justify-content:space-between; font-size:14px; font-weight:bold; border-bottom:1px dashed rgba(0,0,0,0.1); padding:6px 0;">
                             <span>${i.type === 'return' ? '🔄' : '-'} ${i.name} (×${i.qty})</span>
-                            <span style="color:${i.type==='return'?'red':'var(--text-main)'}">${i.type === 'return' ? '-' : ''}${i.qty * i.price} ج</span>
+                            <span style="color:${i.type==='return'?'var(--danger)':'var(--text-main)'}">${i.type === 'return' ? '-' : ''}${i.qty * i.price} ج</span>
                         </div>`;
                     }).join('');
 
                     list.innerHTML += `
-                        <div class="item-card glass-panel" style="flex-direction:column; align-items:stretch; margin-inline: 0; padding:12px;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom: 2px solid var(--glass-border); padding-bottom:5px;">
-                                <strong><i class="far fa-clock"></i> ${trans.time}</strong>
-                                <strong style="color:var(--primary-zayti)">صافي: ${trans.net} ج</strong>
+                        <div class="item-card glass-panel" style="flex-direction:column; align-items:stretch; margin-inline: 20px; padding:15px; border-radius:18px;">
+                            <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom: 2px solid var(--glass-border-dark); padding-bottom:8px;">
+                                <strong style="font-size:16px;"><i class="far fa-clock"></i> ${trans.time}</strong>
+                                <strong style="color:var(--primary-zayti); font-size:18px; text-shadow:0 1px 2px rgba(0,0,0,0.05);">صافي: ${trans.net} ج</strong>
                             </div>
                             ${itemsHtml}
                         </div>
@@ -563,7 +691,7 @@
                 const closedDays = JSON.parse(localStorage.getItem('alshaikh_closed_days')) || {};
                 closedDays[today] = true;
                 localStorage.setItem('alshaikh_closed_days', JSON.stringify(closedDays));
-                showToast("🔒 تم تقفيل اليومية");
+                showToast("🔒 تم تقفيل اليومية بنجاح");
                 loadDailyReport();
             }
         }
@@ -575,7 +703,7 @@
             let total = 0;
 
             let html = `
-                <img src="dfaa70b3-1828-475b-a413-7df2e374ab9a.jfif" class="print-watermark" alt="Watermark">
+                <img src="احمد الشيخ (3).png" class="print-watermark" alt="Watermark">
                 <div class="print-header">
                     <h2>محلات أحمد الشيخ</h2>
                     <h3 style="color:#555;">يومية المبيعات والكاشير</h3>
@@ -608,7 +736,6 @@
             window.print();
         }
 
-        // --- 3. Firebase Debt Logic (Maintained & Protected) ---
         onAuthStateChanged(auth, (user) => {
             loader.style.display = 'none';
             if (user) { 
@@ -638,7 +765,7 @@
                 const list = document.getElementById('customersList'); list.innerHTML = '';
                 
                 if (snapshot.empty) {
-                    list.innerHTML = `<div class="empty-state"><p>لا يوجد مديونيات مسجلة</p></div>`;
+                    list.innerHTML = `<div class="empty-state"><i class="fas fa-users"></i><p>لا يوجد مديونيات مسجلة</p></div>`;
                 } else {
                     snapshot.forEach((doc) => {
                         const data = doc.data(); data.id = doc.id;
@@ -719,12 +846,12 @@
         function renderWorkspace() {
             const customer = customersData.find(c => c.id === currentCustomerId);
             if(!customer) return;
-            document.getElementById('currentCustomerName').innerHTML = `<span style="font-size: 18px; font-weight:900;"><i class="fas fa-user-circle"></i> ${customer.name}</span>`;
+            document.getElementById('currentCustomerName').innerHTML = `<span style="font-size: 19px; font-weight:900;"><i class="fas fa-user-circle"></i> ${customer.name}</span>`;
 
             const list = document.getElementById('debtsList'); list.innerHTML = '';
             
             if (customer.items.length === 0) {
-                list.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-check"></i><p>حساب العميل مصفر</p></div>`;
+                list.innerHTML = `<div class="empty-state"><i class="fas fa-clipboard-check"></i><p>حساب العميل مُصفّر</p></div>`;
             } else {
                 customer.items.forEach((item, index) => {
                     let total = item.qty * item.price;
@@ -735,7 +862,7 @@
                                     <span class="item-title"><i class="fas fa-arrow-down" style="color:var(--success);"></i> ${item.name}</span>
                                     <span class="item-meta"><i class="far fa-clock"></i> ${item.date}</span>
                                 </div>
-                                <div class="item-totals"><span class="item-price">- ${item.price} ج</span></div>
+                                <div class="item-totals"><span class="item-price" style="color:var(--success);">- ${item.price} ج</span></div>
                             </div>
                         `;
                     } else {
@@ -755,7 +882,7 @@
         }
 
         window.deleteCustomer = async function() {
-            if(!confirm('تحذير: هل تريد حذف حساب العميل بالكامل؟')) return;
+            if(!confirm('تحذير: هل تريد حذف حساب العميل بالكامل؟ (لا يمكن التراجع)')) return;
             await deleteDoc(doc(db, "customers", currentCustomerId));
             closeWorkspace(); showToast("تم حذف الحساب");
         };
@@ -763,7 +890,7 @@
         window.printInvoice = function() {
             const c = customersData.find(c => c.id === currentCustomerId);
             let html = `
-                <img src="dfaa70b3-1828-475b-a413-7df2e374ab9a.jfif" class="print-watermark" alt="Watermark">
+                <img src="احمد الشيخ (3).png" class="print-watermark" alt="Watermark">
                 <div class="print-header">
                     <h2>محلات أحمد الشيخ</h2>
                     <h3 style="color:#555;">كشف حساب عميل مفصل (آجل)</h3>
@@ -798,7 +925,6 @@
             window.print();
         };
 
-        // Initialize empty cart
         renderPOSCart();
     </script>
 </body>
