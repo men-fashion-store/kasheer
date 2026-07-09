@@ -230,42 +230,94 @@
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        .product-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;
-            margin-bottom: 12px;
+        .product-picker-backdrop {
+            display: none; position: fixed; inset: 0; z-index: 48; background: rgba(0,0,0,0.25);
         }
-        .product-btn {
-            background: var(--input-bg); border: 2px solid var(--glass-border-dark);
-            color: var(--text-main); padding: 14px 10px; border-radius: 14px;
-            font-size: 14px; font-weight: 800; cursor: pointer; transition: 0.15s;
-            min-height: 54px;
-            display: flex; align-items: center; justify-content: center; text-align: center;
-        }
-        .product-btn:active { transform: scale(0.96); background: rgba(62,79,26,0.08); }
-        .product-btn.selected {
-            background: var(--primary-zayti); color: #fff;
-            border-color: var(--primary-zayti);
-            box-shadow: 0 5px 15px rgba(62,79,26,0.3);
-        }
-        .product-btn.other-btn { border-style: dashed; }
-        .product-btn.other-btn.selected { border-style: solid; }
-        #posCustomRow { display: none; margin-bottom: 10px; }
-        #posCustomRow.show { display: block; }
-        .selected-product-label {
-            font-size: 14px; font-weight: 800; color: var(--primary-zayti);
-            margin-bottom: 8px; min-height: 22px;
-        }
+        .product-picker-backdrop.show { display: block; }
 
-        .qty-stepper {
-            display: flex; align-items: stretch; gap: 8px; flex: 1;
+        .pos-sale-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1.5fr) minmax(72px, 0.75fr) minmax(88px, 0.85fr);
+            gap: 10px;
+            align-items: end;
         }
-        .qty-stepper input { text-align: center; font-weight: 900; font-size: 18px; flex: 1; min-width: 0; }
-        .stepper-btn {
-            width: 52px; min-height: 52px; border: none; border-radius: 14px;
-            background: var(--primary-zayti); color: #fff; font-size: 24px; font-weight: 900;
+        .pos-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+        .pos-field label {
+            font-size: 12px; font-weight: 900; color: var(--text-muted);
+            padding-inline: 4px;
+        }
+        .product-picker-wrap { position: relative; min-width: 0; }
+
+        .product-picker-trigger {
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+            text-align: right; cursor: pointer; min-height: 52px; padding: 12px 14px;
+            font-weight: 800; font-size: 14px;
+        }
+        .product-picker-trigger i { color: var(--primary-zayti); font-size: 14px; flex-shrink: 0; transition: 0.2s; }
+        .product-picker-trigger.open i { transform: rotate(180deg); }
+        .product-picker-trigger .picker-text {
+            flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        .product-picker-trigger.placeholder .picker-text { color: var(--text-muted); font-weight: 700; }
+
+        .product-picker-panel {
+            display: none; position: absolute; top: calc(100% + 6px); right: 0; left: 0;
+            z-index: 50; border-radius: 16px; overflow: hidden;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.18);
+            max-height: min(52vh, 320px);
+            flex-direction: column;
+        }
+        .product-picker-panel.open { display: flex; }
+
+        .product-picker-list {
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
+            max-height: min(40vh, 240px);
+        }
+        .product-picker-item {
+            display: block; width: 100%; text-align: right;
+            background: transparent; border: none; border-bottom: 1px solid var(--glass-border-dark);
+            color: var(--text-main); padding: 14px 16px; font-size: 15px; font-weight: 800;
+            cursor: pointer; min-height: 50px;
+        }
+        .product-picker-item:active, .product-picker-item.selected {
+            background: rgba(62,79,26,0.12); color: var(--primary-zayti);
+        }
+        .product-picker-other {
+            padding: 12px; border-top: 2px dashed var(--glass-border-dark);
+            background: var(--input-bg); flex-shrink: 0;
+        }
+        .product-picker-other span {
+            display: block; font-size: 12px; font-weight: 900; color: var(--text-muted); margin-bottom: 8px;
+        }
+        .product-picker-other input { min-height: 48px; font-size: 15px; }
+
+        .qty-compact {
+            display: flex; align-items: stretch; gap: 4px;
+        }
+        .qty-compact input {
+            text-align: center; font-weight: 900; font-size: 17px;
+            padding: 10px 4px; min-height: 52px; min-width: 0; flex: 1;
+        }
+        .stepper-btn-sm {
+            width: 40px; min-height: 52px; border: none; border-radius: 12px;
+            background: var(--primary-zayti); color: #fff; font-size: 20px; font-weight: 900;
             display: flex; align-items: center; justify-content: center; flex-shrink: 0;
         }
-        .stepper-btn:active { transform: scale(0.94); opacity: 0.9; }
+        .stepper-btn-sm:active { transform: scale(0.94); opacity: 0.9; }
+
+        .pos-field-price input { text-align: center; font-weight: 900; font-size: 17px; }
+        .pos-actions-row { display: flex; gap: 10px; margin-top: 14px; }
+        .pos-actions-row .btn-action { margin-top: 0; flex: 1; }
+
+        #view-cashier .workspace-forms { overflow: visible; position: relative; z-index: 20; }
+        .product-picker-panel.open { z-index: 110; }
+        .product-picker-backdrop.show { z-index: 105; }
+
+        @media (max-width: 380px) {
+            .pos-sale-row { grid-template-columns: 1fr 64px 80px; gap: 6px; }
+            .pos-field label { font-size: 11px; }
+            .stepper-btn-sm { width: 34px; }
+        }
 
         .cashier-sticky-bar {
             display: none;
@@ -434,6 +486,8 @@
 
     <img src="احمد الشيخ (3).png" class="app-watermark" alt="خلفية أحمد الشيخ">
 
+    <div id="productPickerBackdrop" class="product-picker-backdrop" onclick="closeProductPicker()"></div>
+
     <div id="loader">
         <i class="fas fa-spinner fa-spin" style="margin-bottom:15px; font-size:40px;"></i>
         جاري تهيئة النظام...
@@ -490,21 +544,37 @@
 
                 <div class="workspace-forms glass-panel" style="margin: 12px 16px; border-radius: 18px;">
                     <form id="posForm">
-                        <p style="font-weight:900; margin-bottom:10px; font-size:14px;"><i class="fas fa-shoe-prints"></i> اختر الصنف:</p>
-                        <div class="product-grid" id="productGrid"></div>
-                        <div id="posCustomRow">
-                            <input type="text" id="posCustomName" class="input-clean" placeholder="اكتب الصنف يدوياً (شئ آخر)..." enterkeyhint="next" autocomplete="off">
-                        </div>
-                        <div id="selectedProductLabel" class="selected-product-label"></div>
-                        <div class="form-row" style="margin-top: 4px;">
-                            <div class="qty-stepper">
-                                <button type="button" class="stepper-btn" onclick="adjustQty(-1)" aria-label="نقص العدد">−</button>
-                                <input type="number" id="posItemQty" class="input-clean" placeholder="العدد" min="1" value="1" required inputmode="numeric" enterkeyhint="next">
-                                <button type="button" class="stepper-btn" onclick="adjustQty(1)" aria-label="زود العدد">+</button>
+                        <div class="pos-sale-row">
+                            <div class="pos-field">
+                                <label>الصنف</label>
+                                <div class="product-picker-wrap">
+                                    <button type="button" id="productPickerTrigger" class="product-picker-trigger input-clean placeholder" onclick="toggleProductPicker()">
+                                        <span id="productPickerLabel" class="picker-text">اختر الصنف</span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div id="productPickerPanel" class="product-picker-panel glass-panel">
+                                        <div id="productPickerList" class="product-picker-list"></div>
+                                        <div class="product-picker-other">
+                                            <span><i class="fas fa-pen"></i> نوع آخر (يدوي)</span>
+                                            <input type="text" id="posCustomName" class="input-clean" placeholder="اكتب الصنف..." enterkeyhint="next" autocomplete="off">
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <input type="number" id="posItemPrice" class="input-clean" placeholder="السعر" min="0" step="any" required style="flex:1;" inputmode="decimal" enterkeyhint="done">
+                            <div class="pos-field pos-field-qty">
+                                <label>العدد</label>
+                                <div class="qty-compact">
+                                    <button type="button" class="stepper-btn-sm" onclick="adjustQty(-1)" aria-label="نقص">−</button>
+                                    <input type="number" id="posItemQty" class="input-clean" min="1" value="1" required inputmode="numeric">
+                                    <button type="button" class="stepper-btn-sm" onclick="adjustQty(1)" aria-label="زيادة">+</button>
+                                </div>
+                            </div>
+                            <div class="pos-field pos-field-price">
+                                <label>السعر</label>
+                                <input type="number" id="posItemPrice" class="input-clean" placeholder="0" min="0" step="any" required inputmode="decimal" enterkeyhint="done">
+                            </div>
                         </div>
-                        <div class="form-row" style="margin-top: 12px; gap: 10px;">
+                        <div class="pos-actions-row">
                             <button type="button" class="btn btn-action btn-add-debt" onclick="addToPOS('sale')"><i class="fas fa-cart-plus"></i> بيع</button>
                             <button type="button" class="btn btn-action btn-add-return" onclick="addToPOS('return')"><i class="fas fa-undo"></i> مرتجع</button>
                         </div>
@@ -714,8 +784,20 @@
             document.getElementById('posItemPrice').addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') { e.preventDefault(); addToPOS('sale'); }
             });
-            document.getElementById('posCustomName')?.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') { e.preventDefault(); document.getElementById('posItemPrice').focus(); }
+            const customInput = document.getElementById('posCustomName');
+            customInput.addEventListener('input', () => {
+                if (customInput.value.trim()) {
+                    isOtherProduct = true;
+                    selectedProduct = '';
+                    document.querySelectorAll('.product-picker-item').forEach(b => b.classList.remove('selected'));
+                    updateProductPickerLabel(customInput.value.trim(), false);
+                }
+            });
+            customInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    selectCustomProduct();
+                }
             });
         }
 
@@ -768,37 +850,70 @@
             return trans.time || '—';
         }
 
-        function initProductGrid() {
-            const grid = document.getElementById('productGrid');
-            grid.innerHTML = PRODUCT_CATEGORIES.map(name =>
-                `<button type="button" class="product-btn" data-product="${name}" onclick="selectProduct('${name}')">${name}</button>`
-            ).join('') + `<button type="button" class="product-btn other-btn" onclick="selectOtherProduct()"><i class="fas fa-pen"></i> شئ آخر</button>`;
+        function updateProductPickerLabel(text, isPlaceholder = false) {
+            const label = document.getElementById('productPickerLabel');
+            const trigger = document.getElementById('productPickerTrigger');
+            label.textContent = text;
+            trigger.classList.toggle('placeholder', isPlaceholder);
+        }
+
+        function initProductPicker() {
+            const list = document.getElementById('productPickerList');
+            list.innerHTML = PRODUCT_CATEGORIES.map(name => {
+                const safe = escapeHtml(name);
+                return `<button type="button" class="product-picker-item" data-product="${safe}" onclick="selectProduct(this.dataset.product)">${safe}</button>`;
+            }).join('');
+        }
+
+        window.toggleProductPicker = function() {
+            const panel = document.getElementById('productPickerPanel');
+            const trigger = document.getElementById('productPickerTrigger');
+            const backdrop = document.getElementById('productPickerBackdrop');
+            const isOpen = panel.classList.toggle('open');
+            trigger.classList.toggle('open', isOpen);
+            backdrop.classList.toggle('show', isOpen);
+        }
+
+        window.closeProductPicker = function() {
+            document.getElementById('productPickerPanel').classList.remove('open');
+            document.getElementById('productPickerTrigger').classList.remove('open');
+            document.getElementById('productPickerBackdrop').classList.remove('show');
         }
 
         window.selectProduct = function(name) {
             selectedProduct = name;
             isOtherProduct = false;
-            document.getElementById('posCustomRow').classList.remove('show');
             document.getElementById('posCustomName').value = '';
-            document.querySelectorAll('.product-btn').forEach(b => b.classList.remove('selected'));
-            document.querySelector(`[data-product="${name}"]`)?.classList.add('selected');
-            document.getElementById('selectedProductLabel').innerHTML = `<i class="fas fa-check-circle"></i> المختار: <strong>${name}</strong>`;
+            document.querySelectorAll('.product-picker-item').forEach(b => {
+                b.classList.toggle('selected', b.dataset.product === name);
+            });
+            updateProductPickerLabel(name, false);
+            closeProductPicker();
             document.getElementById('posItemPrice').focus();
         }
 
-        window.selectOtherProduct = function() {
+        function selectCustomProduct() {
+            const custom = document.getElementById('posCustomName').value.trim();
+            if (!custom) return;
             selectedProduct = '';
             isOtherProduct = true;
-            document.querySelectorAll('.product-btn').forEach(b => b.classList.remove('selected'));
-            document.querySelector('.other-btn')?.classList.add('selected');
-            document.getElementById('posCustomRow').classList.add('show');
-            document.getElementById('selectedProductLabel').innerHTML = '<i class="fas fa-pen"></i> اكتب الصنف يدوياً';
-            document.getElementById('posCustomName').focus();
+            document.querySelectorAll('.product-picker-item').forEach(b => b.classList.remove('selected'));
+            updateProductPickerLabel(custom, false);
+            closeProductPicker();
+            document.getElementById('posItemPrice').focus();
         }
 
         function getPosItemName() {
             if (isOtherProduct) return document.getElementById('posCustomName').value.trim();
             return selectedProduct;
+        }
+
+        function resetProductSelection() {
+            selectedProduct = '';
+            isOtherProduct = false;
+            document.getElementById('posCustomName').value = '';
+            document.querySelectorAll('.product-picker-item').forEach(b => b.classList.remove('selected'));
+            updateProductPickerLabel('اختر الصنف', true);
         }
 
         function updateCashierDayStatus(isClosed) {
@@ -904,17 +1019,16 @@
             const qty = parseInt(qtyEl.value);
             const price = parseFloat(priceEl.value);
 
-            if(!name) { showToast("يرجى اختيار الصنف أو كتابته"); return; }
+            if(!name) { showToast("يرجى اختيار الصنف أو كتابته"); toggleProductPicker(); return; }
             if(isNaN(qty) || qty < 1) { showToast("يرجى إدخال عدد صحيح"); return; }
             if(isNaN(price) || price < 0) { showToast("يرجى إدخال سعر صحيح"); return; }
 
             posTempCart.push({ name, qty, price, type, id: Date.now() });
             tapFeedback();
             renderPOSCart();
-            if (isOtherProduct) document.getElementById('posCustomName').value = '';
+            resetProductSelection();
             qtyEl.value = '1'; priceEl.value = '';
-            if (isOtherProduct) document.getElementById('posCustomName').focus();
-            else document.getElementById('posItemPrice').focus();
+            document.getElementById('posItemPrice').focus();
         }
 
         window.removeFromPOS = function(id) {
@@ -1158,7 +1272,8 @@
             appContainer.style.display = 'block';
             bottomNav.style.display = 'flex';
             document.getElementById('dailyDateSelector').value = getLocalDateString();
-            initProductGrid();
+            initProductPicker();
+            resetProductSelection();
             initMobileUX();
             watchCashierDayStatus();
             executeTabSwitch('cashier');
