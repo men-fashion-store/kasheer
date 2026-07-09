@@ -288,6 +288,16 @@
         #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--text-main); color: var(--bg-page); padding: 16px 32px; border-radius: 30px; font-weight: 900; font-size: 16px; opacity: 0; pointer-events: none; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index: 10000; box-shadow: 0 15px 35px rgba(0,0,0,0.3), inset 0 2px 0 rgba(255,255,255,0.2); }
         #toast.show { opacity: 1; top: 50px; }
 
+        /* --- نافذة كلمة المرور الزجاجية --- */
+        #password-modal {
+            display: none; position: fixed; inset: 0; z-index: 10000; 
+            justify-content: center; align-items: center; 
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            padding: 30px; width: 90%; max-width: 350px; text-align: center;
+        }
+
         /* --- إعدادات الطباعة للـ PDF --- */
         #printArea { display: none; }
         @media print {
@@ -307,7 +317,6 @@
 </head>
 <body> 
 
-    <!-- اللوجو الجديد كخلفية مائية ثلاثية الأبعاد -->
     <img src="احمد الشيخ (3).png" class="app-watermark" alt="خلفية أحمد الشيخ">
 
     <div id="loader">
@@ -317,6 +326,18 @@
     
     <div id="toast">رسالة</div>
     <div id="printArea"></div>
+
+    <!-- نافذة إدخال كلمة المرور (الحماية) -->
+    <div id="password-modal">
+        <div class="glass-panel modal-content">
+            <h3 style="margin-bottom: 20px; color:var(--text-main); font-weight:900;"><i class="fas fa-lock"></i> يرجى إدخال كلمة المرور</h3>
+            <input type="password" id="section-password" class="input-clean" placeholder="كلمة المرور..." style="margin-bottom: 20px; text-align: center; font-size:20px; letter-spacing: 5px;">
+            <div style="display:flex; gap:10px;">
+                <button class="btn btn-primary" id="btn-submit-pass" style="flex:1;">دخول</button>
+                <button class="btn btn-action" id="btn-cancel-pass" style="background: linear-gradient(145deg, var(--danger), #c9302c); flex:1; margin-top:0;">إلغاء</button>
+            </div>
+        </div>
+    </div>
 
     <!-- شاشة تسجيل الدخول -->
     <div id="login-screen">
@@ -487,9 +508,27 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, doc, onSnapshot, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, onSnapshot, updateDoc, deleteDoc, serverTimestamp, setDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = {
+        // ==========================================
+        // 1. إعدادات قاعدة بيانات (آيتن) - للكاشير واليوميات
+        // ==========================================
+        const configAyten = {
+            apiKey: "AIzaSyCZTnzsDjfQsdsUuzwkwK4h_zTbfQqKWgY",
+            authDomain: "ayten-243b0.firebaseapp.com",
+            projectId: "ayten-243b0",
+            storageBucket: "ayten-243b0.firebasestorage.app",
+            messagingSenderId: "55093741825",
+            appId: "1:55093741825:web:c559c8ef92d9b6ee613300"
+        };
+        const appAyten = initializeApp(configAyten, "appAyten");
+        const dbAyten = getFirestore(appAyten);
+        const authAyten = getAuth(appAyten); // هنستخدم تسجيل الدخول الخاص بآيتن كأنه الأساسي
+
+        // ==========================================
+        // 2. إعدادات قاعدة بيانات (أحمد الشيخ القديمة) - للمديونيات
+        // ==========================================
+        const configDebts = {
             apiKey: "AIzaSyD2KpnA4gUBsQI1W7V0L805BnnrZvkXxCc",
             authDomain: "alshaikh-1c6c0.firebaseapp.com",
             projectId: "alshaikh-1c6c0",
@@ -497,11 +536,11 @@
             messagingSenderId: "389334396277",
             appId: "1:389334396277:web:76f4149be590fc85d3373c"
         };
+        const appDebts = initializeApp(configDebts, "appDebts");
+        const dbDebts = getFirestore(appDebts);
+        const authDebts = getAuth(appDebts); 
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
+        // UI Elements
         const loader = document.getElementById('loader');
         const loginScreen = document.getElementById('login-screen');
         const appContainer = document.getElementById('app-container');
@@ -511,6 +550,14 @@
         let currentCustomerId = null;
         let customersData = []; 
         let posTempCart = [];
+        let unsubDaily = null; // لمراقبة اليومية المفتوحة
+
+        // متغيرات الحماية بالباسورد
+        let unlockedDaily = false;
+        let unlockedDebts = false;
+        let pendingTabToOpen = null;
+        window.currentDayIsClosed = false;
+        window.dailyTransactionsForPrint = [];
 
         window.showToast = function(msg) {
             const t = document.getElementById('toast'); t.innerHTML = msg; t.classList.add('show');
@@ -536,7 +583,47 @@
             return `${y}-${m}-${d}`;
         }
 
+        // --- نظام الحماية للتنقل بين الأقسام ---
         window.switchTab = function(tabName) {
+            if (tabName === 'daily' && !unlockedDaily) {
+                showPasswordPrompt('daily'); return;
+            }
+            if (tabName === 'debts' && !unlockedDebts) {
+                showPasswordPrompt('debts'); return;
+            }
+            executeTabSwitch(tabName);
+        }
+
+        function showPasswordPrompt(tabName) {
+            pendingTabToOpen = tabName;
+            document.getElementById('password-modal').style.display = 'flex';
+            document.getElementById('section-password').value = '';
+            document.getElementById('section-password').focus();
+        }
+
+        document.getElementById('btn-cancel-pass').addEventListener('click', () => {
+            document.getElementById('password-modal').style.display = 'none';
+            pendingTabToOpen = null;
+        });
+
+        document.getElementById('section-password').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') document.getElementById('btn-submit-pass').click();
+        });
+
+        document.getElementById('btn-submit-pass').addEventListener('click', () => {
+            const pass = document.getElementById('section-password').value;
+            if (pass === '123') { // الباسورد المطلوب
+                document.getElementById('password-modal').style.display = 'none';
+                if (pendingTabToOpen === 'daily') unlockedDaily = true;
+                if (pendingTabToOpen === 'debts') unlockedDebts = true;
+                executeTabSwitch(pendingTabToOpen);
+                showToast("<i class='fas fa-unlock'></i> تم فتح القسم");
+            } else {
+                showToast("❌ كلمة المرور غير صحيحة!");
+            }
+        });
+
+        function executeTabSwitch(tabName) {
             document.querySelectorAll('.main-view').forEach(v => v.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`view-${tabName}`).classList.add('active');
@@ -548,18 +635,18 @@
             }
         }
 
+        // ==========================================
+        // الكاشير واليومية (متصل بقاعدة آيتن dbAyten)
+        // ==========================================
         window.addToPOS = function(type) {
             const nameEl = document.getElementById('posItemName');
             const qtyEl = document.getElementById('posItemQty');
             const priceEl = document.getElementById('posItemPrice');
-            
             const name = nameEl.value.trim();
             const qty = parseInt(qtyEl.value);
             const price = parseFloat(priceEl.value);
 
-            if(!name || isNaN(qty) || isNaN(price)) {
-                showToast("يرجى ملء كافة البيانات"); return;
-            }
+            if(!name || isNaN(qty) || isNaN(price)) { showToast("يرجى ملء كافة البيانات"); return; }
 
             posTempCart.push({ name, qty, price, type, id: Date.now() });
             renderPOSCart();
@@ -601,105 +688,117 @@
                     </div>
                 `;
             });
-            
             document.getElementById('btnCompleteTransaction').style.display = 'block';
             document.getElementById('btnCompleteTransaction').innerHTML = `<i class="fas fa-check-circle"></i> إنهاء (الصافي: ${total} ج.م)`;
         }
 
-        window.completeTransaction = function() {
+        window.completeTransaction = async function() {
             if(posTempCart.length === 0) return;
-            const today = getLocalDateString();
-            
-            const closedDays = JSON.parse(localStorage.getItem('alshaikh_closed_days')) || {};
-            if(closedDays[today]) {
-                showToast("❌ لا يمكن البيع. يومية اليوم مقفلة!");
-                return;
+            if(window.currentDayIsClosed) {
+                showToast("❌ لا يمكن البيع. يومية اليوم مقفلة!"); return;
             }
 
-            const dailyData = JSON.parse(localStorage.getItem('alshaikh_daily_sales')) || {};
-            if(!dailyData[today]) dailyData[today] = [];
-
+            const today = getLocalDateString();
             const transaction = {
+                id: Date.now(),
                 time: new Date().toLocaleTimeString('ar-EG'),
                 items: posTempCart,
                 net: posTempCart.reduce((acc, curr) => acc + (curr.type==='return' ? -(curr.qty*curr.price) : (curr.qty*curr.price)), 0)
             };
 
-            dailyData[today].push(transaction);
-            localStorage.setItem('alshaikh_daily_sales', JSON.stringify(dailyData));
+            const dayRef = doc(dbAyten, "daily_sales", today);
             
-            posTempCart = [];
-            renderPOSCart();
-            showToast("✅ تم الترحيل لليومية بنجاح");
+            try {
+                document.getElementById('btnCompleteTransaction').innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الترحيل...';
+                await setDoc(dayRef, { transactions: arrayUnion(transaction) }, { merge: true });
+                posTempCart = [];
+                renderPOSCart();
+                showToast("✅ تم الترحيل لليومية بنجاح");
+            } catch(e) {
+                showToast("❌ حدث خطأ في الاتصال بالانترنت");
+                document.getElementById('btnCompleteTransaction').innerHTML = `<i class="fas fa-check-circle"></i> حاول مرة أخرى`;
+            }
         }
 
         window.loadDailyReport = function() {
             const date = document.getElementById('dailyDateSelector').value;
             if(!date) return;
+            if(unsubDaily) unsubDaily();
 
-            const dailyData = JSON.parse(localStorage.getItem('alshaikh_daily_sales')) || {};
-            const closedDays = JSON.parse(localStorage.getItem('alshaikh_closed_days')) || {};
-            const transactions = dailyData[date] || [];
+            const dayRef = doc(dbAyten, "daily_sales", date);
             
-            const list = document.getElementById('dailyTransactionsList');
-            const statusIndicator = document.getElementById('dailyStatusIndicator');
-            const closeBtn = document.getElementById('btnCloseDayBtn');
-            list.innerHTML = '';
-            
-            let grandTotal = 0;
+            unsubDaily = onSnapshot(dayRef, (docSnap) => {
+                const list = document.getElementById('dailyTransactionsList');
+                const statusIndicator = document.getElementById('dailyStatusIndicator');
+                const closeBtn = document.getElementById('btnCloseDayBtn');
+                list.innerHTML = '';
+                let grandTotal = 0;
 
-            const isClosed = closedDays[date];
-            if(isClosed) {
-                statusIndicator.className = 'daily-status status-closed glass-panel';
-                statusIndicator.innerHTML = '<i class="fas fa-lock"></i> اليومية مقفلة ولا يمكن التعديل عليها';
-                closeBtn.style.display = 'none';
-            } else {
-                statusIndicator.className = 'daily-status status-open glass-panel';
-                statusIndicator.innerHTML = '<i class="fas fa-lock-open"></i> اليومية مفتوحة';
-                closeBtn.style.display = date === getLocalDateString() ? 'block' : 'none';
-            }
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const transactions = data.transactions || [];
+                    const isClosed = data.isClosed || false;
 
-            if(transactions.length === 0) {
-                list.innerHTML = `<div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><p>لا توجد مبيعات مسجلة في هذا اليوم</p></div>`;
-            } else {
-                transactions.forEach((trans, tIndex) => {
-                    grandTotal += trans.net;
-                    let itemsHtml = trans.items.map(i => {
-                        return `<div style="display:flex; justify-content:space-between; font-size:14px; font-weight:bold; border-bottom:1px dashed rgba(0,0,0,0.1); padding:6px 0;">
-                            <span>${i.type === 'return' ? '🔄' : '-'} ${i.name} (×${i.qty})</span>
-                            <span style="color:${i.type==='return'?'var(--danger)':'var(--text-main)'}">${i.type === 'return' ? '-' : ''}${i.qty * i.price} ج</span>
-                        </div>`;
-                    }).join('');
+                    if(date === getLocalDateString()) window.currentDayIsClosed = isClosed;
 
-                    list.innerHTML += `
-                        <div class="item-card glass-panel" style="flex-direction:column; align-items:stretch; margin-inline: 20px; padding:15px; border-radius:18px;">
-                            <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom: 2px solid var(--glass-border-dark); padding-bottom:8px;">
-                                <strong style="font-size:16px;"><i class="far fa-clock"></i> ${trans.time}</strong>
-                                <strong style="color:var(--primary-zayti); font-size:18px; text-shadow:0 1px 2px rgba(0,0,0,0.05);">صافي: ${trans.net} ج</strong>
-                            </div>
-                            ${itemsHtml}
-                        </div>
-                    `;
-                });
-            }
-            document.getElementById('dailyNetTotal').innerText = grandTotal + " ج.م";
+                    if(isClosed) {
+                        statusIndicator.className = 'daily-status status-closed glass-panel';
+                        statusIndicator.innerHTML = '<i class="fas fa-lock"></i> اليومية مقفلة ولا يمكن التعديل عليها';
+                        closeBtn.style.display = 'none';
+                    } else {
+                        statusIndicator.className = 'daily-status status-open glass-panel';
+                        statusIndicator.innerHTML = '<i class="fas fa-lock-open"></i> اليومية مفتوحة';
+                        closeBtn.style.display = date === getLocalDateString() ? 'block' : 'none';
+                    }
+
+                    if(transactions.length === 0) {
+                        list.innerHTML = `<div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><p>لا توجد مبيعات مسجلة</p></div>`;
+                    } else {
+                        transactions.forEach((trans) => {
+                            grandTotal += trans.net;
+                            let itemsHtml = trans.items.map(i => {
+                                return `<div style="display:flex; justify-content:space-between; font-size:14px; font-weight:bold; border-bottom:1px dashed rgba(0,0,0,0.1); padding:6px 0;">
+                                    <span>${i.type === 'return' ? '🔄' : '-'} ${i.name} (×${i.qty})</span>
+                                    <span style="color:${i.type==='return'?'var(--danger)':'var(--text-main)'}">${i.type === 'return' ? '-' : ''}${i.qty * i.price} ج</span>
+                                </div>`;
+                            }).join('');
+
+                            list.innerHTML += `
+                                <div class="item-card glass-panel" style="flex-direction:column; align-items:stretch; margin-inline: 20px; padding:15px; border-radius:18px;">
+                                    <div style="display:flex; justify-content:space-between; margin-bottom:10px; border-bottom: 2px solid var(--glass-border-dark); padding-bottom:8px;">
+                                        <strong style="font-size:16px;"><i class="far fa-clock"></i> ${trans.time}</strong>
+                                        <strong style="color:var(--primary-zayti); font-size:18px; text-shadow:0 1px 2px rgba(0,0,0,0.05);">صافي: ${trans.net} ج</strong>
+                                    </div>
+                                    ${itemsHtml}
+                                </div>
+                            `;
+                        });
+                    }
+                    window.dailyTransactionsForPrint = transactions;
+                } else {
+                    if(date === getLocalDateString()) window.currentDayIsClosed = false;
+                    statusIndicator.className = 'daily-status status-open glass-panel';
+                    statusIndicator.innerHTML = '<i class="fas fa-lock-open"></i> اليومية مفتوحة';
+                    closeBtn.style.display = date === getLocalDateString() ? 'block' : 'none';
+                    list.innerHTML = `<div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><p>لا توجد مبيعات مسجلة في هذا اليوم</p></div>`;
+                    window.dailyTransactionsForPrint = [];
+                }
+                document.getElementById('dailyNetTotal').innerText = grandTotal + " ج.م";
+            });
         }
 
-        window.closeCurrentDay = function() {
+        window.closeCurrentDay = async function() {
             const today = getLocalDateString();
-            if(confirm('تحذير: تقفيل اليومية يمنع إضافة أو تعديل مبيعات هذا اليوم. هل أنت متأكد؟')) {
-                const closedDays = JSON.parse(localStorage.getItem('alshaikh_closed_days')) || {};
-                closedDays[today] = true;
-                localStorage.setItem('alshaikh_closed_days', JSON.stringify(closedDays));
+            if(confirm('تحذير: تقفيل اليومية يمنع البيع نهائياً لهذا اليوم. متأكد؟')) {
+                const dayRef = doc(dbAyten, "daily_sales", today);
+                await setDoc(dayRef, { isClosed: true }, { merge: true });
                 showToast("🔒 تم تقفيل اليومية بنجاح");
-                loadDailyReport();
             }
         }
 
         window.printDailyReport = function() {
             const date = document.getElementById('dailyDateSelector').value;
-            const dailyData = JSON.parse(localStorage.getItem('alshaikh_daily_sales')) || {};
-            const transactions = dailyData[date] || [];
+            const transactions = window.dailyTransactionsForPrint || [];
             let total = 0;
 
             let html = `
@@ -731,19 +830,26 @@
                     <div class="print-total">إجمالي الدرج (الصافي): ${total} ج.م</div>
                 </div>
             `;
-            
             document.getElementById('printArea').innerHTML = html;
             window.print();
         }
 
-        onAuthStateChanged(auth, (user) => {
+        // ==========================================
+        // مصادقة الدخول والاتصال بالمديونيات (dbDebts)
+        // ==========================================
+        onAuthStateChanged(authAyten, (user) => {
             loader.style.display = 'none';
             if (user) { 
                 loginScreen.style.display = 'none'; 
                 appContainer.style.display = 'block'; 
                 bottomNav.style.display = 'flex';
-                loadCustomers(); 
+                
+                loadCustomers(); // جلب الداتا من dbDebts
                 document.getElementById('dailyDateSelector').value = getLocalDateString();
+                
+                unlockedDaily = false;
+                unlockedDebts = false;
+                executeTabSwitch('cashier'); 
             } else { 
                 loginScreen.style.display = 'flex'; 
                 appContainer.style.display = 'none'; 
@@ -751,16 +857,28 @@
             }
         });
 
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            signInWithEmailAndPassword(auth, document.getElementById('email').value, document.getElementById('password').value)
-                .catch(() => { document.getElementById('login-error').style.display = 'block'; document.getElementById('login-error').innerText = "بيانات الدخول غير صحيحة!"; });
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            try {
+                // تسجيل الدخول على آيتن أولاً (الأساسي)
+                await signInWithEmailAndPassword(authAyten, email, password);
+                // محاولة تسجيل الدخول في المديونيات حتى لو قواعد الحماية هناك مقفولة
+                try { await signInWithEmailAndPassword(authDebts, email, password); } catch(e){} 
+            } catch(err) {
+                document.getElementById('login-error').style.display = 'block'; 
+                document.getElementById('login-error').innerText = "بيانات الدخول غير صحيحة!";
+            }
         });
         
-        document.getElementById('logoutBtnPos').addEventListener('click', () => signOut(auth));
+        document.getElementById('logoutBtnPos').addEventListener('click', () => {
+            signOut(authAyten); signOut(authDebts);
+        });
 
+        // المديونيات متصلة بـ dbDebts الخاص بـ Al-shaikh
         function loadCustomers() {
-            onSnapshot(collection(db, "customers"), (snapshot) => {
+            onSnapshot(collection(dbDebts, "customers"), (snapshot) => {
                 customersData = [];
                 const list = document.getElementById('customersList'); list.innerHTML = '';
                 
@@ -807,7 +925,7 @@
             const name = document.getElementById('newCustomerName').value.trim();
             const phone = document.getElementById('newCustomerPhone').value.trim();
             if(!name) return;
-            await addDoc(collection(db, "customers"), { name, phone, items: [], createdAt: serverTimestamp() });
+            await addDoc(collection(dbDebts, "customers"), { name, phone, items: [], createdAt: serverTimestamp() });
             e.target.reset(); showToast("<i class='fas fa-check-circle'></i> تم إضافة العميل");
         });
 
@@ -831,7 +949,7 @@
                 qty: parseFloat(row.querySelector('.i-qty').value), 
                 price: parseFloat(row.querySelector('.i-price').value) 
             };
-            await updateDoc(doc(db, "customers", currentCustomerId), { items: [...c.items, newItem] });
+            await updateDoc(doc(dbDebts, "customers", currentCustomerId), { items: [...c.items, newItem] });
             e.target.reset(); row.querySelector('.i-name').focus();
         });
 
@@ -839,7 +957,7 @@
             e.preventDefault();
             const c = customersData.find(c => c.id === currentCustomerId);
             const newItem = { type: 'payment', date: getLocalDateString(), name: 'دفعة مسددة', qty: 1, price: parseFloat(document.getElementById('paymentAmount').value) };
-            await updateDoc(doc(db, "customers", currentCustomerId), { items: [...c.items, newItem] });
+            await updateDoc(doc(dbDebts, "customers", currentCustomerId), { items: [...c.items, newItem] });
             e.target.reset();
         });
 
@@ -883,7 +1001,7 @@
 
         window.deleteCustomer = async function() {
             if(!confirm('تحذير: هل تريد حذف حساب العميل بالكامل؟ (لا يمكن التراجع)')) return;
-            await deleteDoc(doc(db, "customers", currentCustomerId));
+            await deleteDoc(doc(dbDebts, "customers", currentCustomerId));
             closeWorkspace(); showToast("تم حذف الحساب");
         };
 
