@@ -713,13 +713,14 @@
         // ==========================================
         // 2. إعدادات قاعدة بيانات (أحمد الشيخ القديمة) - للمديونيات
         // ==========================================
+        // تم تعديلها لاستخدام نفس قاعدة البيانات (آيتن) لتجنب مشاكل المصادقة
         const configDebts = {
-            apiKey: "AIzaSyD2KpnA4gUBsQI1W7V0L805BnnrZvkXxCc",
-            authDomain: "alshaikh-1c6c0.firebaseapp.com",
-            projectId: "alshaikh-1c6c0",
-            storageBucket: "alshaikh-1c6c0.firebasestorage.app",
-            messagingSenderId: "389334396277",
-            appId: "1:389334396277:web:76f4149be590fc85d3373c"
+            apiKey: "AIzaSyCZTnzsDjfQsdsUuzwkwK4h_zTbfQqKWgY",
+            authDomain: "ayten-243b0.firebaseapp.com",
+            projectId: "ayten-243b0",
+            storageBucket: "ayten-243b0.firebasestorage.app",
+            messagingSenderId: "55093741825",
+            appId: "1:55093741825:web:c559c8ef92d9b6ee613300"
         };
         const appDebts = initializeApp(configDebts, "appDebts");
         const dbDebts = getFirestore(appDebts);
@@ -793,8 +794,6 @@
         const SHOP_FB_EMAIL = 'shop@alshaikh.app';
         const SHOP_FB_PASS = '123456';
 
-        // متغيرات الحماية بالباسورد
-        let pendingTabToOpen = null;
         window.currentDayIsClosed = false;
         window.dailyTransactionsForPrint = [];
 
@@ -930,47 +929,13 @@
             return `${y}-${m}-${d}`;
         }
 
-        // --- نظام الحماية للتنقل بين الأقسام (الباسورد مطلوب في كل مرة) ---
+        // --- نظام التنقل بين الأقسام (بدون كلمة مرور) ---
         window.switchTab = function(tabName) {
             const activeNav = document.querySelector('.nav-btn.active');
             const currentTab = activeNav ? activeNav.id.replace('nav-', '') : null;
             if (currentTab === tabName) return;
-
-            if (tabName === 'daily' || tabName === 'debts') {
-                showPasswordPrompt(tabName);
-                return;
-            }
             executeTabSwitch(tabName);
         }
-
-        function showPasswordPrompt(tabName) {
-            pendingTabToOpen = tabName;
-            document.getElementById('password-modal').style.display = 'flex';
-            document.getElementById('section-password').value = '';
-            document.getElementById('section-password').focus();
-        }
-
-        document.getElementById('btn-cancel-pass').addEventListener('click', () => {
-            document.getElementById('password-modal').style.display = 'none';
-            pendingTabToOpen = null;
-        });
-
-        document.getElementById('section-password').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') document.getElementById('btn-submit-pass').click();
-        });
-
-        document.getElementById('btn-submit-pass').addEventListener('click', () => {
-            const pass = document.getElementById('section-password').value;
-            if (pass === APP_PASSWORD) {
-                document.getElementById('password-modal').style.display = 'none';
-                const tab = pendingTabToOpen;
-                pendingTabToOpen = null;
-                executeTabSwitch(tab);
-                showToast("<i class='fas fa-unlock'></i> تم فتح القسم");
-            } else {
-                showToast("❌ كلمة المرور غير صحيحة!");
-            }
-        });
 
         function executeTabSwitch(tabName) {
             if (typeof window.closeWorkspace === 'function') window.closeWorkspace();
@@ -1277,17 +1242,15 @@
         }
 
         async function connectDebtsAuth() {
-            if (authDebts.currentUser) return true;
-            if (!debtsAuthPromise) {
-                debtsAuthPromise = signInWithEmailAndPassword(authDebts, SHOP_FB_EMAIL, SHOP_FB_PASS)
-                    .then(() => true)
-                    .catch((err) => {
-                        console.warn('debts auth:', err?.code || err);
-                        return false;
-                    })
-                    .finally(() => { debtsAuthPromise = null; });
+            // استخدام نفس المصادقة الخاصة بآيتن
+            if (authAyten.currentUser) return true;
+            try {
+                await connectAytenAuth();
+                return true;
+            } catch (e) {
+                console.warn('debts auth:', e?.code || e);
+                return false;
             }
-            return debtsAuthPromise;
         }
 
         async function connectFirebase() {
