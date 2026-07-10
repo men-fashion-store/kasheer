@@ -1052,9 +1052,17 @@
             const dayRef = doc(dbAyten, "daily_sales", today);
 
             try {
-                completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                completeBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
                 console.log('جاري حفظ المعاملة في قاعدة البيانات...', transaction);
-                await setDoc(dayRef, { transactions: arrayUnion(transaction) }, { merge: true });
+                
+                // إضافة timeout 15 ثانية
+                const savePromise = setDoc(dayRef, { transactions: arrayUnion(transaction) }, { merge: true });
+                const timeoutPromise = new Promise((_, reject) => 
+                    setTimeout(() => reject(new Error('انتهت مهلة الحفظ - تحقق من الاتصال')), 15000)
+                );
+                
+                await Promise.race([savePromise, timeoutPromise]);
+                
                 console.log('✅ تم حفظ المعاملة بنجاح');
                 posTempCart = [];
                 tapFeedback();
@@ -1063,7 +1071,15 @@
                 showToast("✅ تم الترحيل لليومية بنجاح");
             } catch(e) {
                 console.error('❌ خطأ في حفظ المعاملة:', e);
-                showToast("❌ حدث خطأ: " + (e.message || 'فشل الاتصال بقاعدة البيانات'));
+                let errorMsg = 'فشل الاتصال بقاعدة البيانات';
+                if (e.message.includes('timeout')) {
+                    errorMsg = 'انتهت مهلة الحفظ - تحقق من الاتصال';
+                } else if (e.code === 'permission-denied') {
+                    errorMsg = 'لا توجد صلاحية للحفظ - تحقق من إعدادات Firebase';
+                } else if (e.code === 'unauthenticated') {
+                    errorMsg = 'غير مسجل الدخول - أعد تسجيل الدخول';
+                }
+                showToast("❌ " + errorMsg);
                 renderPOSCart();
             } finally {
                 isCompleting = false;
@@ -1244,11 +1260,24 @@
         async function connectAytenAuth() {
             if (authAyten.currentUser) return;
             try {
+                console.log('جاري محاولة الاتصال بقاعدة آيتن بـ:', SHOP_FB_EMAIL);
                 await signInWithEmailAndPassword(authAyten, SHOP_FB_EMAIL, SHOP_FB_PASS);
                 console.log('✅ تم الاتصال بقاعدة آيتن بنجاح');
             } catch (e) {
                 console.error('❌ خطأ في الاتصال بقاعدة آيتن:', e?.code || e);
-                showToast('⚠️ مشكلة في الاتصال بقاعدة البيانات');
+                if (e.code === 'auth/user-not-found') {
+                    console.error('المستخدم غير موجود في Firebase Authentication لمشروع ayten-243b0');
+                    console.error('الحل: أنشئ المستخدم shop@alshaikh.app في Firebase Console');
+                    showToast('❌ المستخدم غير موجود في قاعدة البيانات');
+                } else if (e.code === 'auth/wrong-password') {
+                    console.error('كلمة المرور غير صحيحة');
+                    showToast('❌ كلمة المرور غير صحيحة');
+                } else if (e.code === 'auth/invalid-credential') {
+                    console.error('بيانات الدخول غير صحيحة');
+                    showToast('❌ بيانات الدخول غير صحيحة');
+                } else {
+                    showToast('⚠️ مشكلة في الاتصال بقاعدة البيانات: ' + (e.code || e));
+                }
                 throw e;
             }
         }
