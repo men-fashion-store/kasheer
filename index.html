@@ -310,6 +310,8 @@
         .pos-actions-row .btn-action { margin-top: 0; flex: 1; }
 
         #view-cashier .workspace-forms { overflow: visible; position: relative; z-index: 20; }
+        /* عند فتح القائمة: نرفع شاشة الكاشير فوق الـ backdrop حتى تصل النقرات للأصناف */
+        #view-cashier.picker-open { z-index: 120; }
         .product-picker-panel.open { z-index: 110; }
         .product-picker-backdrop.show { z-index: 105; }
 
@@ -869,15 +871,18 @@
             const panel = document.getElementById('productPickerPanel');
             const trigger = document.getElementById('productPickerTrigger');
             const backdrop = document.getElementById('productPickerBackdrop');
+            const cashierView = document.getElementById('view-cashier');
             const isOpen = panel.classList.toggle('open');
             trigger.classList.toggle('open', isOpen);
             backdrop.classList.toggle('show', isOpen);
+            cashierView.classList.toggle('picker-open', isOpen);
         }
 
         window.closeProductPicker = function() {
             document.getElementById('productPickerPanel').classList.remove('open');
             document.getElementById('productPickerTrigger').classList.remove('open');
             document.getElementById('productPickerBackdrop').classList.remove('show');
+            document.getElementById('view-cashier').classList.remove('picker-open');
         }
 
         window.selectProduct = function(name) {
