@@ -713,14 +713,14 @@
         // ==========================================
         // 2. إعدادات قاعدة بيانات (أحمد الشيخ القديمة) - للمديونيات
         // ==========================================
-        // تم تعديلها لاستخدام نفس قاعدة البيانات (آيتن) لتجنب مشاكل المصادقة
         const configDebts = {
-            apiKey: "AIzaSyCZTnzsDjfQsdsUuzwkwK4h_zTbfQqKWgY",
-            authDomain: "ayten-243b0.firebaseapp.com",
-            projectId: "ayten-243b0",
-            storageBucket: "ayten-243b0.firebasestorage.app",
-            messagingSenderId: "55093741825",
-            appId: "1:55093741825:web:c559c8ef92d9b6ee613300"
+            apiKey: "AIzaSyD2KpnA4gUBsQI1W7V0L805BnnrZvkXxCc",
+            authDomain: "alshaikh-1c6c0.firebaseapp.com",
+            projectId: "alshaikh-1c6c0",
+            storageBucket: "alshaikh-1c6c0.firebasestorage.app",
+            messagingSenderId: "389334396277",
+            appId: "1:389334396277:web:76f4149be590fc85d3373c",
+            measurementId: "G-DNXHNFVD9V"
         };
         const appDebts = initializeApp(configDebts, "appDebts");
         const dbDebts = getFirestore(appDebts);
@@ -1242,15 +1242,19 @@
         }
 
         async function connectDebtsAuth() {
-            // استخدام نفس المصادقة الخاصة بآيتن
-            if (authAyten.currentUser) return true;
-            try {
-                await connectAytenAuth();
-                return true;
-            } catch (e) {
-                console.warn('debts auth:', e?.code || e);
-                return false;
+            // محاولة المصادقة لقاعدة المديونيات
+            if (authDebts.currentUser) return true;
+            if (!debtsAuthPromise) {
+                debtsAuthPromise = signInWithEmailAndPassword(authDebts, SHOP_FB_EMAIL, SHOP_FB_PASS)
+                    .then(() => true)
+                    .catch((err) => {
+                        console.warn('debts auth:', err?.code || err);
+                        // إذا فشلت المصادقة، سنسمح بالوصول على أي حال
+                        return true;
+                    })
+                    .finally(() => { debtsAuthPromise = null; });
             }
+            return debtsAuthPromise;
         }
 
         async function connectFirebase() {
