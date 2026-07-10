@@ -764,6 +764,10 @@
         let selectedProduct = '';
         let isOtherProduct = false;
         let isCompleting = false;
+        let debtsAuthPromise = null;
+        let debtsLoadRetryTimer = null;
+        let debtsLoadAttempts = 0;
+        const DEBTS_MAX_RETRIES = 4;
 
         function tapFeedback() {
             if (navigator.vibrate) navigator.vibrate(10);
@@ -1281,6 +1285,7 @@
             resetProductSelection();
             initMobileUX();
             watchCashierDayStatus();
+            warmDebtsConnection();
             executeTabSwitch('cashier');
         }
 
@@ -1292,8 +1297,52 @@
 
         async function connectFirebase() {
             await signInWithEmailAndPassword(authAyten, SHOP_FB_EMAIL, SHOP_FB_PASS);
-            try { await signInWithEmailAndPassword(authDebts, SHOP_FB_EMAIL, SHOP_FB_PASS); } catch (e) {}
+            warmDebtsConnection();
         }
+
+        function warmDebtsConnection() {
+            ensureDebtsAuth().catch(() => {});
+        }
+
+        async function ensureDebtsAuth() {
+            if (authDebts.currentUser) return true;
+            if (!debtsAuthPromise) {
+                debtsAuthPromise = signInWithEmailAndPassword(authDebts, SHOP_FB_EMAIL, SHOP_FB_PASS)
+                    .then(() => true)
+                    .catch((err) => {
+                        console.warn('debts auth:', err?.code || err);
+                        return false;
+                    })
+                    .finally(() => { debtsAuthPromise = null; });
+            }
+            return debtsAuthPromise;
+        }
+
+        function renderDebtsLoading() {
+            const list = document.getElementById('customersList');
+            const totalBar = document.getElementById('debtsGrandTotal');
+            totalBar.style.display = 'none';
+            list.innerHTML = `<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><p>جاري تحميل المديونيات...</p></div>`;
+        }
+
+        function renderDebtsError() {
+            const list = document.getElementById('customersList');
+            const totalBar = document.getElementById('debtsGrandTotal');
+            totalBar.style.display = 'none';
+            list.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-cloud-download-alt"></i>
+                    <p>لم يتم تحميل البيانات بعد</p>
+                    <button type="button" class="btn btn-action" style="margin-top:14px; max-width:220px; font-size:15px;" onclick="retryLoadCustomers()">
+                        <i class="fas fa-redo"></i> إعادة المحاولة
+                    </button>
+                </div>`;
+        }
+
+        window.retryLoadCustomers = function() {
+            debtsLoadAttempts = 0;
+            loadCustomers();
+        };
 
         onAuthStateChanged(authAyten, (user) => {
             loader.style.display = 'none';
@@ -1376,11 +1425,28 @@
         }
 
         // المديونيات فقط → dbDebts (alshaikh-1c6c0) / collection: customers
-        function loadCustomers() {
-            if(unsubCustomers) unsubCustomers();
+        async function loadCustomers() {
+            if (unsubCustomers) { unsubCustomers(); unsubCustomers = null; }
+            if (debtsLoadRetryTimer) { clearTimeout(debtsLoadRetryTimer); debtsLoadRetryTimer = null; }
+
+            renderDebtsLoading();
+
+            const authed = await ensureDebtsAuth();
+            if (!authed) {
+                debtsLoadAttempts++;
+                if (debtsLoadAttempts < DEBTS_MAX_RETRIES) {
+                    debtsLoadRetryTimer = setTimeout(() => loadCustomers(), 2000);
+                    return;
+                }
+                renderDebtsError();
+                return;
+            }
+
+            debtsLoadAttempts = 0;
+
             unsubCustomers = onSnapshot(collection(dbDebts, "customers"), (snapshot) => {
                 customersData = [];
-                
+
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data(); data.id = docSnap.id;
                     if(!data.items) data.items = [];
@@ -1398,7 +1464,21 @@
                 if (currentCustomerId) renderWorkspace();
             }, (error) => {
                 console.error('debts db error:', error);
-                showToast("❌ تعذر الاتصال بقاعدة المديونيات");
+                if (unsubCustomers) { unsubCustomers(); unsubCustomers = null; }
+
+                const retryable = ['unavailable', 'deadline-exceeded', 'resource-exhausted', 'permission-denied', 'unauthenticated'].includes(error?.code);
+                if (retryable && debtsLoadAttempts < DEBTS_MAX_RETRIES) {
+                    debtsLoadAttempts++;
+                    if (error.code === 'permission-denied' || error.code === 'unauthenticated') {
+                        signOut(authDebts).catch(() => {});
+                    }
+                    renderDebtsLoading();
+                    debtsLoadRetryTimer = setTimeout(() => loadCustomers(), 2500);
+                    return;
+                }
+
+                debtsLoadAttempts = 0;
+                renderDebtsError();
             });
         }
 
@@ -1413,10 +1493,11 @@
             const phone = document.getElementById('newCustomerPhone').value.trim();
             if(!name) return;
             try {
+                if (!(await ensureDebtsAuth())) { showToast("تحقق من الاتصال وحاول مرة أخرى"); return; }
                 await addDoc(collection(dbDebts, "customers"), { name, phone, items: [], createdAt: serverTimestamp() });
-                e.target.reset(); showToast("<i class='fas fa-check-circle'></i> تم إضافة العميل");
+                e.target.reset();
             } catch(err) {
-                showToast("❌ فشل إضافة العميل — تحقق من الاتصال");
+                showToast("تعذّر حفظ العميل — حاول مرة أخرى");
             }
         });
 
