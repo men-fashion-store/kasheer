@@ -767,7 +767,8 @@
         let debtsAuthPromise = null;
         let debtsLoadRetryTimer = null;
         let debtsLoadAttempts = 0;
-        const DEBTS_MAX_RETRIES = 4;
+        let customersSyncStarted = false;
+        const DEBTS_MAX_RETRIES = 6;
 
         function tapFeedback() {
             if (navigator.vibrate) navigator.vibrate(10);
@@ -1285,7 +1286,7 @@
             resetProductSelection();
             initMobileUX();
             watchCashierDayStatus();
-            warmDebtsConnection();
+            ensureBackendReady();
             executeTabSwitch('cashier');
         }
 
@@ -1295,16 +1296,12 @@
             bottomNav.style.display = 'none';
         }
 
-        async function connectFirebase() {
+        async function connectAytenAuth() {
+            if (authAyten.currentUser) return;
             await signInWithEmailAndPassword(authAyten, SHOP_FB_EMAIL, SHOP_FB_PASS);
-            warmDebtsConnection();
         }
 
-        function warmDebtsConnection() {
-            ensureDebtsAuth().catch(() => {});
-        }
-
-        async function ensureDebtsAuth() {
+        async function connectDebtsAuth() {
             if (authDebts.currentUser) return true;
             if (!debtsAuthPromise) {
                 debtsAuthPromise = signInWithEmailAndPassword(authDebts, SHOP_FB_EMAIL, SHOP_FB_PASS)
@@ -1316,6 +1313,72 @@
                     .finally(() => { debtsAuthPromise = null; });
             }
             return debtsAuthPromise;
+        }
+
+        async function connectFirebase() {
+            await connectAytenAuth();
+            await connectDebtsAuth();
+        }
+
+        async function ensureBackendReady() {
+            try {
+                await connectAytenAuth();
+                await connectDebtsAuth();
+            } catch (err) {
+                console.warn('backend connect:', err?.code || err);
+            }
+            startCustomersSync();
+        }
+
+        function applyCustomersSnapshot(snapshot) {
+            customersData = [];
+
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data(); data.id = docSnap.id;
+                if(!data.items) data.items = [];
+                let total = 0;
+                data.items.forEach(i => {
+                    if(i.type === 'payment') total -= i.price;
+                    else total += (i.qty * i.price);
+                });
+                data.totalDebt = total; customersData.push(data);
+            });
+
+            customersData.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
+            renderCustomersList();
+            if (document.getElementById('searchInput').value) filterCustomers();
+            if (currentCustomerId) renderWorkspace();
+        }
+
+        function handleCustomersSyncError(error) {
+            console.error('debts db error:', error);
+            if (unsubCustomers) { unsubCustomers(); unsubCustomers = null; }
+            customersSyncStarted = false;
+
+            if (debtsLoadAttempts < DEBTS_MAX_RETRIES) {
+                debtsLoadAttempts++;
+                const delay = Math.min(1500 * debtsLoadAttempts, 8000);
+                debtsLoadRetryTimer = setTimeout(() => startCustomersSync(), delay);
+                if (customersData.length === 0 && document.getElementById('view-debts').classList.contains('active')) {
+                    renderDebtsLoading();
+                }
+                return;
+            }
+
+            debtsLoadAttempts = 0;
+            if (customersData.length === 0 && document.getElementById('view-debts').classList.contains('active')) {
+                renderDebtsError();
+            }
+        }
+
+        function startCustomersSync() {
+            if (unsubCustomers || customersSyncStarted) return;
+            customersSyncStarted = true;
+
+            unsubCustomers = onSnapshot(collection(dbDebts, "customers"), (snapshot) => {
+                debtsLoadAttempts = 0;
+                applyCustomersSnapshot(snapshot);
+            }, handleCustomersSyncError);
         }
 
         function renderDebtsLoading() {
@@ -1341,17 +1404,27 @@
 
         window.retryLoadCustomers = function() {
             debtsLoadAttempts = 0;
-            loadCustomers();
+            customersSyncStarted = false;
+            if (unsubCustomers) { unsubCustomers(); unsubCustomers = null; }
+            if (debtsLoadRetryTimer) { clearTimeout(debtsLoadRetryTimer); debtsLoadRetryTimer = null; }
+            renderDebtsLoading();
+            ensureBackendReady();
         };
 
         onAuthStateChanged(authAyten, (user) => {
             loader.style.display = 'none';
             if (sessionStorage.getItem('app_ok') === '1') {
                 showAppUI();
-                if (!user) connectFirebase().catch(() => showToast('⚠️ تحقق من الاتصال بالإنترنت'));
+                if (!user) {
+                    connectFirebase()
+                        .then(() => startCustomersSync())
+                        .catch(() => ensureBackendReady());
+                }
             } else {
                 if(unsubDaily) { unsubDaily(); unsubDaily = null; }
                 if(unsubCustomers) { unsubCustomers(); unsubCustomers = null; }
+                customersSyncStarted = false;
+                if (debtsLoadRetryTimer) { clearTimeout(debtsLoadRetryTimer); debtsLoadRetryTimer = null; }
                 if(unsubCashierDay) { unsubCashierDay(); unsubCashierDay = null; }
                 if (typeof window.closeWorkspace === 'function') window.closeWorkspace();
                 posTempCart = [];
@@ -1425,61 +1498,15 @@
         }
 
         // المديونيات فقط → dbDebts (alshaikh-1c6c0) / collection: customers
-        async function loadCustomers() {
-            if (unsubCustomers) { unsubCustomers(); unsubCustomers = null; }
-            if (debtsLoadRetryTimer) { clearTimeout(debtsLoadRetryTimer); debtsLoadRetryTimer = null; }
-
-            renderDebtsLoading();
-
-            const authed = await ensureDebtsAuth();
-            if (!authed) {
-                debtsLoadAttempts++;
-                if (debtsLoadAttempts < DEBTS_MAX_RETRIES) {
-                    debtsLoadRetryTimer = setTimeout(() => loadCustomers(), 2000);
-                    return;
-                }
-                renderDebtsError();
+        function loadCustomers() {
+            if (!customersSyncStarted) {
+                if (customersData.length === 0) renderDebtsLoading();
+                ensureBackendReady();
                 return;
             }
-
-            debtsLoadAttempts = 0;
-
-            unsubCustomers = onSnapshot(collection(dbDebts, "customers"), (snapshot) => {
-                customersData = [];
-
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data(); data.id = docSnap.id;
-                    if(!data.items) data.items = [];
-                    let total = 0;
-                    data.items.forEach(i => {
-                        if(i.type === 'payment') total -= i.price;
-                        else total += (i.qty * i.price);
-                    });
-                    data.totalDebt = total; customersData.push(data);
-                });
-
-                customersData.sort((a, b) => a.name.localeCompare(b.name, 'ar'));
-                renderCustomersList();
-                if (document.getElementById('searchInput').value) filterCustomers();
-                if (currentCustomerId) renderWorkspace();
-            }, (error) => {
-                console.error('debts db error:', error);
-                if (unsubCustomers) { unsubCustomers(); unsubCustomers = null; }
-
-                const retryable = ['unavailable', 'deadline-exceeded', 'resource-exhausted', 'permission-denied', 'unauthenticated'].includes(error?.code);
-                if (retryable && debtsLoadAttempts < DEBTS_MAX_RETRIES) {
-                    debtsLoadAttempts++;
-                    if (error.code === 'permission-denied' || error.code === 'unauthenticated') {
-                        signOut(authDebts).catch(() => {});
-                    }
-                    renderDebtsLoading();
-                    debtsLoadRetryTimer = setTimeout(() => loadCustomers(), 2500);
-                    return;
-                }
-
-                debtsLoadAttempts = 0;
-                renderDebtsError();
-            });
+            renderCustomersList();
+            if (document.getElementById('searchInput').value) filterCustomers();
+            if (currentCustomerId) renderWorkspace();
         }
 
         window.filterCustomers = function() {
@@ -1493,7 +1520,7 @@
             const phone = document.getElementById('newCustomerPhone').value.trim();
             if(!name) return;
             try {
-                if (!(await ensureDebtsAuth())) { showToast("تحقق من الاتصال وحاول مرة أخرى"); return; }
+                await connectDebtsAuth();
                 await addDoc(collection(dbDebts, "customers"), { name, phone, items: [], createdAt: serverTimestamp() });
                 e.target.reset();
             } catch(err) {
