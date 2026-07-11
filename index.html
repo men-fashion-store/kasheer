@@ -15,23 +15,23 @@
     <style>
         /* --- المتغيرات والتصميم الزجاجي ثلاثي الأبعاد --- */
         :root {
-            --primary-zayti: #3E4F1A; 
-            --primary-zayti-hover: #2e3b13;
-            --bg-page: #f0f2f5; 
+            --primary-zayti: #5a7a3a; 
+            --primary-zayti-hover: #4a6a2a;
+            --bg-page: #f8fafc; 
             
-            --glass-bg: rgba(255, 255, 255, 0.55);
-            --workspace-glass: rgba(245, 245, 245, 0.85); 
-            --glass-border-light: rgba(255, 255, 255, 0.7);
-            --glass-border-dark: rgba(0, 0, 0, 0.05);
-            --glass-shadow: 0 10px 30px 0 rgba(62, 79, 26, 0.1);
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --workspace-glass: rgba(250, 250, 250, 0.9); 
+            --glass-border-light: rgba(255, 255, 255, 0.8);
+            --glass-border-dark: rgba(0, 0, 0, 0.04);
+            --glass-shadow: 0 10px 30px 0 rgba(90, 122, 58, 0.08);
             
-            --text-main: #3E4F1A;
-            --text-muted: #5a6b3d;
-            --input-bg: rgba(255, 255, 255, 0.9);
-            --danger: #d9534f;
-            --success: #25D366;
-            --info: #007bff; 
-            --warning: #f0ad4e;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --input-bg: rgba(255, 255, 255, 0.95);
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --info: #3498db; 
+            --warning: #f39c12;
             --transition: 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             --nav-h: 80px;
             --sticky-h: 0px;
@@ -97,6 +97,87 @@
 
         .btn, .input-clean { outline: none; transition: var(--transition); }
         
+        .btn-action {
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background: #ffffff;
+            border: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+        }
+        .btn-action::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0,0,0,0.05), transparent);
+            transition: left 0.5s;
+        }
+        .btn-action:hover::before {
+            left: 100%;
+        }
+        .btn-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        .btn-action:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%);
+            color: #fff;
+            box-shadow: 0 6px 20px rgba(62, 79, 26, 0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 8px 25px rgba(62, 79, 26, 0.4);
+            transform: translateY(-2px);
+        }
+        
+        .stat-card-3d {
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .stat-card-3d:hover {
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15), inset 0 4px 0 rgba(255,255,255,0.9), inset 0 -6px 0 rgba(0,0,0,0.1);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+        
+        .glass-panel {
+            animation: fadeInUp 0.6s ease-out;
+        }
+        
+        .cart-item {
+            animation: fadeInUp 0.4s ease-out;
+        }
+        
+        .item-card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
         .input-clean { 
             background: var(--input-bg); 
             border: 1px solid var(--glass-border-dark); 
@@ -154,15 +235,28 @@
             padding: 0 6px;
         }
         .nav-btn { 
-            background: none; border: none; color: var(--text-muted); 
+            background: #ffffff;
+            border: none;
+            color: var(--text-muted); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             font-size: 12px; gap: 4px; width: 33%; min-height: 56px; cursor: pointer; 
-            transition: 0.2s; font-weight: 800; 
+            transition: all 0.3s ease; font-weight: 800; 
             padding: 8px 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border-radius: 16px;
         }
         .nav-btn i { font-size: 26px; transition: 0.2s; }
-        .nav-btn.active { color: var(--primary-zayti); }
-        .nav-btn.active i { transform: translateY(-3px) scale(1.1); }
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        .nav-btn.active { 
+            background: linear-gradient(135deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(62, 79, 26, 0.3);
+        }
+        .nav-btn.active i { transform: translateY(-2px) scale(1.05); }
 
         #login-screen { position: absolute; inset: 0; z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; display: none; background: var(--bg-page); }
         .login-box { padding: 40px 30px; border-radius: 30px; width: 100%; max-width: 400px; text-align: center; z-index: 1; }
@@ -300,10 +394,17 @@
         }
         .stepper-btn-sm {
             width: 40px; min-height: 52px; border: none; border-radius: 12px;
-            background: var(--primary-zayti); color: #fff; font-size: 20px; font-weight: 900;
+            background: #ffffff;
+            color: var(--primary-zayti); font-size: 20px; font-weight: 900;
             display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
         }
-        .stepper-btn-sm:active { transform: scale(0.94); opacity: 0.9; }
+        .stepper-btn-sm:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+        .stepper-btn-sm:active { transform: translateY(0); }
 
         .pos-field-price input { text-align: center; font-weight: 900; font-size: 17px; }
         .pos-actions-row { display: flex; gap: 10px; margin-top: 14px; }
@@ -430,8 +531,24 @@
         .item-price { font-size: 19px; font-weight: 900; direction: ltr; text-shadow: 0 1px 2px rgba(0,0,0,0.05); }
         .is-return .item-price { color: var(--warning); }
         
-        .btn-delete { background: rgba(217,83,79,0.1); border: 1px solid rgba(217,83,79,0.2); color: var(--danger); font-size: 16px; padding: 10px 14px; border-radius: 12px; cursor: pointer; transition: 0.15s; font-weight:bold; min-width: 44px; min-height: 44px; }
-        .btn-delete:active { background: var(--danger); color: white; }
+        .btn-delete { 
+            background: #ffffff;
+            border: none;
+            color: #d9534f; 
+            font-size: 16px; padding: 10px 14px; border-radius: 12px; cursor: pointer; 
+            transition: all 0.3s ease; 
+            font-weight:bold; min-width: 44px; min-height: 44px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(217, 83, 79, 0.2);
+        }
+        .btn-delete:active { 
+            transform: translateY(0);
+            background: #d9534f;
+            color: white;
+        }
 
         .empty-state { text-align: center; padding: 60px 20px; color: var(--text-muted); opacity: 0.7; font-weight: 800; font-size: 18px; }
         .empty-state i { font-size: 50px; margin-bottom: 20px; display: block; color: var(--primary-zayti); opacity: 0.5; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.1)); }
@@ -494,7 +611,7 @@
             <h2 style="margin-bottom:25px; color:var(--text-main); font-weight:900;">أحمد الشيخ</h2>
             <form id="loginForm">
                 <input type="password" id="password" class="input-clean" style="margin-bottom:25px; text-align:center; font-size:28px; letter-spacing:8px;" required placeholder="كلمة المرور" inputmode="numeric" autocomplete="off" maxlength="12">
-                <button type="submit" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> دخول</button>
+                <button type="submit" class="btn btn-action" style="background: linear-gradient(135deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%); border: none; color: #fff;"><i class="fas fa-sign-in-alt"></i> دخول</button>
                 <p id="login-error" style="color:var(--danger); margin-top:15px; display:none; font-weight:900; background: rgba(217,83,79,0.1); padding:10px; border-radius:10px;"></p>
             </form>
         </div>
@@ -523,10 +640,15 @@
 
                 <div class="workspace-forms glass-panel" style="margin: 12px 16px; border-radius: 18px;">
                     <form id="posForm">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                            <button type="button" id="modeSaleReturn" class="btn btn-action" style="flex: 1; color: var(--success);" onclick="switchPOSMode('saleReturn')"><i class="fas fa-shopping-cart"></i> بيع / مرتجع</button>
+                            <button type="button" id="modeExpense" class="btn btn-action" style="flex: 1; color: var(--danger);" onclick="switchPOSMode('expense')"><i class="fas fa-money-bill-wave"></i> مصاريف</button>
+                        </div>
+
                         <div class="pos-sale-row">
                             <div class="pos-field">
-                                <label>الصنف</label>
-                                <div class="product-picker-wrap">
+                                <label id="productLabel">الصنف</label>
+                                <div class="product-picker-wrap" id="productPickerWrap">
                                     <button type="button" id="productPickerTrigger" class="product-picker-trigger input-clean placeholder" onclick="toggleProductPicker()">
                                         <span id="productPickerLabel" class="picker-text">اختر الصنف</span>
                                         <i class="fas fa-chevron-down"></i>
@@ -539,8 +661,9 @@
                                         </div>
                                     </div>
                                 </div>
+                                <input type="text" id="expenseDescription" class="input-clean" placeholder="اكتب المصروف..." style="display: none;" autocomplete="off">
                             </div>
-                            <div class="pos-field pos-field-qty">
+                            <div class="pos-field pos-field-qty" id="qtyField">
                                 <label>العدد</label>
                                 <div class="qty-compact">
                                     <button type="button" class="stepper-btn-sm" onclick="adjustQty(-1)" aria-label="نقص">−</button>
@@ -554,8 +677,9 @@
                             </div>
                         </div>
                         <div class="pos-actions-row">
-                            <button type="button" class="btn btn-action btn-add-debt" onclick="addToPOS('sale')"><i class="fas fa-cart-plus"></i> بيع</button>
-                            <button type="button" class="btn btn-action btn-add-return" onclick="addToPOS('return')"><i class="fas fa-undo"></i> مرتجع</button>
+                            <button type="button" class="btn btn-action" id="btnSale" style="background: linear-gradient(135deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%); color: #fff;" onclick="addToPOS('sale')"><i class="fas fa-cart-plus"></i> بيع</button>
+                            <button type="button" class="btn btn-action" id="btnReturn" style="background: linear-gradient(135deg, var(--warning) 0%, #e67e22 100%); color: #fff;" onclick="addToPOS('return')"><i class="fas fa-undo"></i> مرتجع</button>
+                            <button type="button" class="btn btn-action" id="btnExpense" style="background: linear-gradient(135deg, var(--danger) 0%, #c0392b 100%); color: #fff; display: none;" onclick="addToPOS('expense')"><i class="fas fa-money-bill-wave"></i> إضافة مصروف</button>
                         </div>
                     </form>
                 </div>
@@ -569,7 +693,7 @@
                     صافي السلة
                     <span id="stickyCartTotal">0 ج.م</span>
                 </div>
-                <button id="btnCompleteTransaction" class="btn btn-primary" onclick="completeTransaction()"><i class="fas fa-check-circle"></i> إنهاء</button>
+                <button id="btnCompleteTransaction" class="btn btn-action" style="background: linear-gradient(135deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%); border: none; color: #fff; width: auto; min-width: 130px; padding: 14px 18px; font-size: 16px; flex-shrink: 0;" onclick="completeTransaction()"><i class="fas fa-check-circle"></i> إنهاء</button>
             </div>
         </div>
 
@@ -588,20 +712,44 @@
                         <i class="fas fa-calendar-alt"></i>
                         <input type="date" id="dailyDateSelector" class="input-clean" onchange="loadDailyReport()">
                     </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-action" id="filterAll" style="flex: 1; min-width: 80px; padding: 12px; font-size: 14px; color: var(--primary-zayti);" onclick="filterDailyTransactions('all')">الكل</button>
+                        <button type="button" class="btn btn-action" id="filterSales" style="flex: 1; min-width: 80px; padding: 12px; font-size: 14px; color: var(--success);" onclick="filterDailyTransactions('sales')">المبيعات</button>
+                        <button type="button" class="btn btn-action" id="filterReturns" style="flex: 1; min-width: 80px; padding: 12px; font-size: 14px; color: var(--warning);" onclick="filterDailyTransactions('returns')">المرتجع</button>
+                        <button type="button" class="btn btn-action" id="filterExpenses" style="flex: 1; min-width: 80px; padding: 12px; font-size: 14px; color: var(--danger);" onclick="filterDailyTransactions('expenses')">المصاريف</button>
+                    </div>
                 </div>
                 
                 <div id="dailyStatusIndicator" class="daily-status glass-panel"></div>
 
-                <div class="daily-totals">
-                    <span>صافي المبيعات:</span>
-                    <span id="dailyNetTotal">0 ج.م</span>
+                <div id="dailyStatsCards" class="glass-panel" style="margin: 15px 20px; padding: 20px; border-radius: 20px;">
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div class="stat-card-3d" style="flex: 1; min-width: 140px; padding: 20px; background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border-radius: 16px; border: 2px solid var(--success); box-shadow: 0 6px 20px rgba(39, 174, 96, 0.15); text-align: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);">
+                            <div style="font-size: 14px; color: var(--success); font-weight: 900; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fas fa-chart-line"></i> المبيعات
+                            </div>
+                            <div id="dailySalesTotal" style="font-size: 24px; font-weight: 900; color: var(--success);">0 ج.م</div>
+                        </div>
+                        <div class="stat-card-3d" style="flex: 1; min-width: 140px; padding: 20px; background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border-radius: 16px; border: 2px solid var(--danger); box-shadow: 0 6px 20px rgba(231, 76, 60, 0.15); text-align: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);">
+                            <div style="font-size: 14px; color: var(--danger); font-weight: 900; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fas fa-receipt"></i> المصاريف
+                            </div>
+                            <div id="dailyExpensesTotal" style="font-size: 24px; font-weight: 900; color: var(--danger);">0 ج.م</div>
+                        </div>
+                        <div class="stat-card-3d" style="flex: 1; min-width: 140px; padding: 20px; background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%); border-radius: 16px; border: 2px solid var(--primary-zayti); box-shadow: 0 6px 20px rgba(90, 122, 58, 0.15); text-align: center; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);">
+                            <div style="font-size: 14px; color: var(--primary-zayti); font-weight: 900; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                                <i class="fas fa-coins"></i> الصافي
+                            </div>
+                            <div id="dailyNetTotal" style="font-size: 24px; font-weight: 900; color: var(--primary-zayti);">0 ج.م</div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="dailyTransactionsList" class="list-container" style="padding-top: 5px;"></div>
 
                 <div style="padding: 15px 20px; display: flex; gap: 12px;">
-                    <button id="btnCloseDayBtn" class="btn btn-action" style="background: linear-gradient(145deg, var(--danger), #c9302c);" onclick="closeCurrentDay()"><i class="fas fa-lock"></i> تقفيل اليومية</button>
-                    <button class="btn btn-action" style="background: linear-gradient(145deg, var(--info), #0056b3);" onclick="printDailyReport()"><i class="fas fa-print"></i> طباعة الوردية</button>
+                    <button id="btnCloseDayBtn" class="btn btn-action" style="color: var(--danger);" onclick="closeCurrentDay()"><i class="fas fa-lock"></i> تقفيل اليومية</button>
+                    <button class="btn btn-action" style="color: var(--info);" onclick="printDailyReport()"><i class="fas fa-print"></i> طباعة الوردية</button>
                 </div>
             </div>
         </div>
@@ -626,7 +774,7 @@
                         <input type="text" id="newCustomerName" class="input-clean" placeholder="اسم العميل الجديد..." required>
                         <div class="add-customer-row">
                             <input type="tel" id="newCustomerPhone" class="input-clean" placeholder="رقم الموبايل (اختياري)" inputmode="tel" autocomplete="tel">
-                            <button type="submit" class="btn" title="حفظ العميل"><i class="fas fa-user-plus"></i></button>
+                            <button type="submit" class="btn btn-action" style="width: 70px; color: var(--primary-zayti); font-size: 20px; display:flex; justify-content:center; align-items:center;" title="حفظ العميل"><i class="fas fa-user-plus"></i></button>
                         </div>
                     </form>
                 </div>
@@ -662,14 +810,14 @@
                         <input type="number" class="input-clean i-qty" placeholder="العدد" min="1" value="1" required style="flex:1;">
                         <input type="number" class="input-clean i-price" placeholder="السعر" min="0" required style="flex:1;">
                     </div>
-                    <button type="submit" class="btn btn-action btn-add-debt"><i class="fas fa-save"></i> تسجيل سحب آجل</button>
+                    <button type="submit" class="btn btn-action" style="color: var(--primary-zayti);"><i class="fas fa-save"></i> تسجيل سحب آجل</button>
                 </form>
                 
                 <hr style="border: 0; border-top: 2px dashed rgba(0,0,0,0.1); margin: 8px 0;">
 
                 <form id="addPaymentForm" class="form-row">
                     <input type="number" id="paymentAmount" class="input-clean" placeholder="مبلغ سداد نقدية" min="1" required style="flex:1;">
-                    <button type="submit" class="btn btn-add-pay" title="تسديد"><i class="fas fa-hand-holding-usd"></i></button>
+                    <button type="submit" class="btn btn-action" style="color: var(--success); width: 70px; border-radius: 16px; font-size: 22px; display: flex; justify-content: center; align-items: center;" title="تسديد"><i class="fas fa-hand-holding-usd"></i></button>
                 </form>
             </div>
 
@@ -796,6 +944,8 @@
 
         window.currentDayIsClosed = false;
         window.dailyTransactionsForPrint = [];
+        window.currentPOSMode = 'saleReturn';
+        window.dailyFilter = 'all';
 
         window.showToast = function(msg) {
             const t = document.getElementById('toast'); t.innerHTML = msg; t.classList.add('show');
@@ -888,6 +1038,9 @@
         }
 
         function getPosItemName() {
+            if (window.currentPOSMode === 'expense') {
+                return document.getElementById('expenseDescription').value.trim();
+            }
             if (isOtherProduct) return document.getElementById('posCustomName').value.trim();
             return selectedProduct;
         }
@@ -898,6 +1051,51 @@
             document.getElementById('posCustomName').value = '';
             document.querySelectorAll('.product-picker-item').forEach(b => b.classList.remove('selected'));
             updateProductPickerLabel('اختر الصنف', true);
+        }
+
+        window.switchPOSMode = function(mode) {
+            window.currentPOSMode = mode;
+            const productPickerWrap = document.getElementById('productPickerWrap');
+            const expenseDescription = document.getElementById('expenseDescription');
+            const qtyField = document.getElementById('qtyField');
+            const productLabel = document.getElementById('productLabel');
+            const btnSale = document.getElementById('btnSale');
+            const btnReturn = document.getElementById('btnReturn');
+            const btnExpense = document.getElementById('btnExpense');
+            const modeSaleReturn = document.getElementById('modeSaleReturn');
+            const modeExpense = document.getElementById('modeExpense');
+
+            if (mode === 'saleReturn') {
+                productPickerWrap.style.display = 'block';
+                expenseDescription.style.display = 'none';
+                qtyField.style.display = 'flex';
+                productLabel.textContent = 'الصنف';
+                btnSale.style.display = 'block';
+                btnReturn.style.display = 'block';
+                btnExpense.style.display = 'none';
+                modeSaleReturn.style.background = 'linear-gradient(135deg, var(--primary-zayti) 0%, var(--primary-zayti-hover) 100%)';
+                modeSaleReturn.style.color = '#fff';
+                modeSaleReturn.style.boxShadow = '0 6px 20px rgba(90, 122, 58, 0.25)';
+                modeExpense.style.background = '#ffffff';
+                modeExpense.style.color = 'var(--danger)';
+                modeExpense.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.08)';
+            } else {
+                productPickerWrap.style.display = 'none';
+                expenseDescription.style.display = 'block';
+                qtyField.style.display = 'none';
+                productLabel.textContent = 'اكتب';
+                btnSale.style.display = 'none';
+                btnReturn.style.display = 'none';
+                btnExpense.style.display = 'block';
+                modeSaleReturn.style.background = '#ffffff';
+                modeSaleReturn.style.color = 'var(--success)';
+                modeSaleReturn.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.08)';
+                modeExpense.style.background = 'linear-gradient(135deg, var(--danger) 0%, #c0392b 100%)';
+                modeExpense.style.color = '#fff';
+                modeExpense.style.boxShadow = '0 6px 20px rgba(231, 76, 60, 0.25)';
+                closeProductPicker();
+            }
+            tapFeedback();
         }
 
         function updateCashierDayStatus(isClosed) {
@@ -919,7 +1117,37 @@
                 const isClosed = docSnap.exists() && docSnap.data().isClosed === true;
                 window.currentDayIsClosed = isClosed;
                 updateCashierDayStatus(isClosed);
+                
+                // تحديث الإحصائيات السريعة
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const transactions = data.transactions || [];
+                    updateQuickStats(transactions);
+                } else {
+                    updateQuickStats([]);
+                }
             });
+        }
+
+        function updateQuickStats(transactions) {
+            let sales = 0;
+            let expenses = 0;
+            
+            transactions.forEach(trans => {
+                trans.items.forEach(item => {
+                    if (item.type === 'sale') {
+                        sales += (item.qty * item.price);
+                    } else if (item.type === 'expense') {
+                        expenses += (item.qty * item.price);
+                    }
+                });
+            });
+            
+            const net = sales - expenses;
+            
+            document.getElementById('dailySalesTotal').textContent = sales + ' ج.م';
+            document.getElementById('dailyExpensesTotal').textContent = expenses + ' ج.م';
+            document.getElementById('dailyNetTotal').textContent = net + ' ج.م';
         }
 
         function getLocalDateString(dateObj = new Date()) {
@@ -966,18 +1194,36 @@
             const qtyEl = document.getElementById('posItemQty');
             const priceEl = document.getElementById('posItemPrice');
             const name = getPosItemName();
-            const qty = parseInt(qtyEl.value);
             const price = parseFloat(priceEl.value);
 
-            if(!name) { showToast("يرجى اختيار الصنف أو كتابته"); toggleProductPicker(); return; }
-            if(isNaN(qty) || qty < 1) { showToast("يرجى إدخال عدد صحيح"); return; }
+            if(!name) {
+                if (window.currentPOSMode === 'expense') {
+                    showToast("يرجى كتابة وصف المصروف");
+                    document.getElementById('expenseDescription').focus();
+                } else {
+                    showToast("يرجى اختيار الصنف أو كتابته");
+                    toggleProductPicker();
+                }
+                return;
+            }
             if(isNaN(price) || price < 0) { showToast("يرجى إدخال سعر صحيح"); return; }
+
+            let qty = 1;
+            if (window.currentPOSMode === 'saleReturn') {
+                qty = parseInt(qtyEl.value);
+                if(isNaN(qty) || qty < 1) { showToast("يرجى إدخال عدد صحيح"); return; }
+            }
 
             posTempCart.push({ name, qty, price, type, id: Date.now() });
             tapFeedback();
             renderPOSCart();
-            resetProductSelection();
-            qtyEl.value = '1'; priceEl.value = '';
+            if (window.currentPOSMode === 'saleReturn') {
+                resetProductSelection();
+                qtyEl.value = '1';
+            } else {
+                document.getElementById('expenseDescription').value = '';
+            }
+            priceEl.value = '';
             document.getElementById('posItemPrice').focus();
         }
 
@@ -1008,16 +1254,19 @@
             posTempCart.forEach(item => {
                 const sub = item.qty * item.price;
                 const isReturn = item.type === 'return';
-                if(isReturn) total -= sub; else total += sub;
+                const isExpense = item.type === 'expense';
+                if(isReturn || isExpense) total -= sub; else total += sub;
+
+                const metaText = isExpense ? `السعر: ${item.price} ج` : `العدد: ${item.qty} | السعر: ${item.price} ج`;
                 
                 container.innerHTML += `
-                    <div class="cart-item ${isReturn ? 'return-item' : ''}">
+                    <div class="cart-item ${isReturn ? 'return-item' : ''} ${isExpense ? 'return-item' : ''}">
                         <div style="flex:1; min-width:0;">
-                            <strong style="font-size:16px; display:block;">${isReturn ? '🔄 مرتجع: ' : '🛍️ '}${escapeHtml(item.name)}</strong>
-                            <small class="item-meta">العدد: ${item.qty} | السعر: ${item.price} ج</small>
+                            <strong style="font-size:16px; display:block;">${isReturn ? '🔄 مرتجع: ' : isExpense ? '💸 مصروف: ' : '🛍️ '}${escapeHtml(item.name)}</strong>
+                            <small class="item-meta">${metaText}</small>
                         </div>
                         <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
-                            <strong style="font-size:18px; color: ${isReturn ? 'var(--danger)' : 'var(--primary-zayti)'}">${isReturn ? '-' : ''}${sub} ج</strong>
+                            <strong style="font-size:18px; color: ${isReturn || isExpense ? 'var(--danger)' : 'var(--primary-zayti)'}">${isReturn || isExpense ? '-' : ''}${sub} ج</strong>
                             <button onclick="removeFromPOS(${item.id})" class="btn-delete" aria-label="حذف"><i class="fas fa-times"></i></button>
                         </div>
                     </div>
@@ -1046,7 +1295,7 @@
                 time: now.toLocaleTimeString('ar-EG'),
                 datetime: getFullDateTime(now),
                 items: [...posTempCart],
-                net: posTempCart.reduce((acc, curr) => acc + (curr.type==='return' ? -(curr.qty*curr.price) : (curr.qty*curr.price)), 0)
+                net: posTempCart.reduce((acc, curr) => acc + ((curr.type==='return' || curr.type==='expense') ? -(curr.qty*curr.price) : (curr.qty*curr.price)), 0)
             };
 
             const dayRef = doc(dbAyten, "daily_sales", today);
@@ -1101,6 +1350,7 @@
                 const closeBtn = document.getElementById('btnCloseDayBtn');
                 list.innerHTML = '';
                 let grandTotal = 0;
+                window.currentDailyTransactions = [];
 
                 if (docSnap.exists()) {
                     const data = docSnap.data();
@@ -1123,13 +1373,14 @@
                     if(transactions.length === 0) {
                         list.innerHTML = `<div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><p>لا توجد مبيعات مسجلة</p></div>`;
                     } else {
+                        window.currentDailyTransactions = transactions;
                         transactions.forEach((trans) => {
                             grandTotal += trans.net;
                             const dateTimeStr = formatTransDateTime(trans);
                             let itemsHtml = trans.items.map(i => {
                                 return `<div style="display:flex; justify-content:space-between; font-size:14px; font-weight:bold; border-bottom:1px dashed rgba(0,0,0,0.1); padding:6px 0;">
-                                    <span>${i.type === 'return' ? '🔄' : '-'} ${escapeHtml(i.name)} (×${i.qty})</span>
-                                    <span style="color:${i.type==='return'?'var(--danger)':'var(--text-main)'}">${i.type === 'return' ? '-' : ''}${i.qty * i.price} ج</span>
+                                    <span>${i.type === 'return' ? '🔄' : i.type === 'expense' ? '💸' : '-'} ${escapeHtml(i.name)} (×${i.qty})</span>
+                                    <span style="color:${i.type==='return' || i.type==='expense'?'var(--danger)':'var(--text-main)'}">${i.type === 'return' || i.type === 'expense' ? '-' : ''}${i.qty * i.price} ج</span>
                                 </div>`;
                             }).join('');
 
@@ -1164,9 +1415,80 @@
                     closeBtn.style.display = date === getLocalDateString() ? 'block' : 'none';
                     list.innerHTML = `<div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><p>لا توجد مبيعات مسجلة في هذا اليوم</p></div>`;
                     window.dailyTransactionsForPrint = [];
+                    window.currentDailyTransactions = [];
                 }
                 document.getElementById('dailyNetTotal').innerText = grandTotal + " ج.م";
+                filterDailyTransactions(window.dailyFilter);
             });
+        }
+
+        window.filterDailyTransactions = function(filterType) {
+            window.dailyFilter = filterType;
+            
+            // تحديث حالة الأزرار
+            document.getElementById('filterAll').style.opacity = filterType === 'all' ? '1' : '0.6';
+            document.getElementById('filterSales').style.opacity = filterType === 'sales' ? '1' : '0.6';
+            document.getElementById('filterReturns').style.opacity = filterType === 'returns' ? '1' : '0.6';
+            document.getElementById('filterExpenses').style.opacity = filterType === 'expenses' ? '1' : '0.6';
+            
+            const transactions = window.currentDailyTransactions || [];
+            const list = document.getElementById('dailyTransactionsList');
+            list.innerHTML = '';
+            let grandTotal = 0;
+            
+            if (transactions.length === 0) {
+                list.innerHTML = `<div class="empty-state"><i class="fas fa-file-invoice-dollar"></i><p>لا توجد مبيعات مسجلة</p></div>`;
+                document.getElementById('dailyNetTotal').innerText = "0 ج.م";
+                return;
+            }
+            
+            const filteredTransactions = transactions.filter(trans => {
+                if (filterType === 'all') return true;
+                if (filterType === 'sales') return trans.items.some(i => i.type === 'sale');
+                if (filterType === 'returns') return trans.items.some(i => i.type === 'return');
+                if (filterType === 'expenses') return trans.items.some(i => i.type === 'expense');
+                return true;
+            });
+            
+            if (filteredTransactions.length === 0) {
+                list.innerHTML = `<div class="empty-state"><i class="fas fa-filter"></i><p>لا توجد معاملات من هذا النوع</p></div>`;
+                document.getElementById('dailyNetTotal').innerText = "0 ج.م";
+                return;
+            }
+            
+            filteredTransactions.forEach((trans) => {
+                grandTotal += trans.net;
+                const dateTimeStr = formatTransDateTime(trans);
+                let itemsHtml = trans.items.map(i => {
+                    return `<div style="display:flex; justify-content:space-between; font-size:14px; font-weight:bold; border-bottom:1px dashed rgba(0,0,0,0.1); padding:6px 0;">
+                        <span>${i.type === 'return' ? '🔄' : i.type === 'expense' ? '💸' : '-'} ${escapeHtml(i.name)} (×${i.qty})</span>
+                        <span style="color:${i.type==='return' || i.type==='expense'?'var(--danger)':'var(--text-main)'}">${i.type === 'return' || i.type === 'expense' ? '-' : ''}${i.qty * i.price} ج</span>
+                    </div>`;
+                }).join('');
+
+                const date = document.getElementById('dailyDateSelector').value;
+                const isClosed = window.currentDayIsClosed && date === getLocalDateString();
+                const deleteBtn = (!isClosed && date === getLocalDateString())
+                    ? `<button onclick="deleteDailyTransaction(${trans.id})" class="btn-delete" title="حذف الفاتورة"><i class="fas fa-trash-alt"></i></button>`
+                    : '';
+
+                list.innerHTML += `
+                    <div class="item-card glass-panel" style="flex-direction:column; align-items:stretch; margin-inline: 20px; padding:15px; border-radius:18px;">
+                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10px; border-bottom: 2px solid var(--glass-border-dark); padding-bottom:8px; gap:10px;">
+                            <div>
+                                <strong style="font-size:15px; display:block;"><i class="far fa-calendar-alt"></i> ${dateTimeStr}</strong>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <strong style="color:var(--primary-zayti); font-size:18px;">صافي: ${trans.net} ج</strong>
+                                ${deleteBtn}
+                            </div>
+                        </div>
+                        ${itemsHtml}
+                    </div>
+                `;
+            });
+            
+            document.getElementById('dailyNetTotal').innerText = grandTotal + " ج.م";
         }
 
         window.deleteDailyTransaction = async function(transId) {
@@ -1201,6 +1523,8 @@
             const date = document.getElementById('dailyDateSelector').value;
             const transactions = window.dailyTransactionsForPrint || [];
             let total = 0;
+            let sales = 0;
+            let expenses = 0;
 
             let html = `
                 <img src="احمد الشيخ (3).png" class="print-watermark" alt="Watermark">
@@ -1211,6 +1535,22 @@
                         <span>تاريخ الوردية: ${date}</span>
                     </div>
                 </div>
+                
+                <div style="display: flex; gap: 20px; margin: 20px 0; justify-content: center;">
+                    <div style="text-align: center; padding: 15px; border: 3px solid #25D366; border-radius: 10px; background: #f9fff9;">
+                        <div style="font-size: 14px; color: #25D366; font-weight: bold; margin-bottom: 5px;">المبيعات</div>
+                        <div id="printSalesTotal" style="font-size: 20px; color: #25D366; font-weight: bold;">0 ج.م</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; border: 3px solid #d9534f; border-radius: 10px; background: #fff9f9;">
+                        <div style="font-size: 14px; color: #d9534f; font-weight: bold; margin-bottom: 5px;">المصاريف</div>
+                        <div id="printExpensesTotal" style="font-size: 20px; color: #d9534f; font-weight: bold;">0 ج.م</div>
+                    </div>
+                    <div style="text-align: center; padding: 15px; border: 3px solid var(--primary-zayti); border-radius: 10px; background: #f9fff9;">
+                        <div style="font-size: 14px; color: var(--primary-zayti); font-weight: bold; margin-bottom: 5px;">الصافي</div>
+                        <div id="printNetTotal" style="font-size: 20px; color: var(--primary-zayti); font-weight: bold;">0 ج.م</div>
+                    </div>
+                </div>
+                
                 <table class="print-table">
                     <tr><th>التاريخ والوقت</th><th>البيان</th><th>صافي العملية</th></tr>
             `;
@@ -1220,7 +1560,14 @@
             } else {
                 transactions.forEach(t => {
                     total += t.net;
-                    let desc = t.items.map(i => `${i.type === 'return' ? '(مرتجع)' : ''} ${escapeHtml(i.name)} (عدد ${i.qty})`).join('<br>');
+                    t.items.forEach(i => {
+                        if (i.type === 'sale') {
+                            sales += (i.qty * i.price);
+                        } else if (i.type === 'expense') {
+                            expenses += (i.qty * i.price);
+                        }
+                    });
+                    let desc = t.items.map(i => `${i.type === 'return' ? '(مرتجع)' : i.type === 'expense' ? '(مصروف)' : ''} ${escapeHtml(i.name)} (عدد ${i.qty})`).join('<br>');
                     html += `<tr><td style="direction:ltr;">${formatTransDateTime(t)}</td><td>${desc}</td><td style="font-weight:bold; direction:ltr;">${t.net} ج</td></tr>`;
                 });
             }
@@ -1232,6 +1579,12 @@
                 </div>
             `;
             document.getElementById('printArea').innerHTML = html;
+            
+            // تحديث الإحصائيات في الطباعة
+            document.getElementById('printSalesTotal').textContent = sales + ' ج.م';
+            document.getElementById('printExpensesTotal').textContent = expenses + ' ج.م';
+            document.getElementById('printNetTotal').textContent = (sales - expenses) + ' ج.م';
+            
             window.print();
         }
 
